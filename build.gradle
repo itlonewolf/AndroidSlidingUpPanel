@@ -5,7 +5,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'com.android.tools.build:gradle:2.1.2'
+    classpath 'com.android.tools.build:gradle:2.3.2'
   }
 }
 
@@ -21,8 +21,8 @@ allprojects {
       mavenCentral()
     }
 }
-
-task wrapper(type: Wrapper) {
-  gradleVersion = '2.13'
-  distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
-}
+//
+//task wrapper(type: Wrapper) {
+//  gradleVersion = '2.13'
+//  distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+//}

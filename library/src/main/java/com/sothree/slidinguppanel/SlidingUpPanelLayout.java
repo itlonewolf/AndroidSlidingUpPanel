@@ -13,6 +13,7 @@ import android.os.Parcelable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,7 +21,6 @@ import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
-
 import com.sothree.slidinguppanel.library.R;
 
 import java.util.List;
@@ -899,6 +899,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mInitialMotionX = x;
                 mInitialMotionY = y;
                 if (!isViewUnder(mDragView, (int) x, (int) y)) {
+                    Log.d("sliding", "不在 mdrag view 区域中");
                     mDragHelper.cancel();
                     mIsUnableToDrag = true;
                     return false;
@@ -960,10 +961,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mDragHelper.abort();
             return super.dispatchTouchEvent(ev);
         }
-
+    
+        final float x = ev.getX();
         final float y = ev.getY();
-
+        
         if (action == MotionEvent.ACTION_DOWN) {
+            
+            if (!isViewUnder(mDragView, (int) x, (int) y)) {
+                Log.d("sliding", "dispatchTouchEvent >>> 不在 mdragview 区域中");
+                return false;
+            }
+            
             mIsScrollableViewHandlingTouch = false;
             mPrevMotionY = y;
         } else if (action == MotionEvent.ACTION_MOVE) {
