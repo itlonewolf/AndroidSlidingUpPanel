@@ -14,9 +14,11 @@ import android.support.annotation.FloatRange;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.*;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
@@ -1220,35 +1222,16 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     
         if (mSlideOffset > 0) {
-            preRange = mSlideRange;
-            if (preRange < mSlideRange) {
-                preRange = mSlideRange;
-            }
-//            int slideRange =  1920 - getPanelHeight();
-            int slideRange = 1920 + mParallaxView.getMeasuredHeight() ;
 //            int slideRange = getHeight() + mParallaxView.getMeasuredHeight() ;
             Log.d("height", "getHeight >>>" + getHeight());
             Log.d("height", "getPanelHeight >>>" + getPanelHeight());
             Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
-//            int slideRange = Math.abs(computePanelTopPosition(0) + computePanelTopPosition(1f)) + mParallaxView.getMeasuredHeight();
-            ViewCompat.setTranslationY(mParallaxView, mSlideOffset * slideRange * -1);
+            Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
+            int slideRange = Math.abs(computePanelTopPosition(0) + computePanelTopPosition(1f));
+            float offset = mSlideOffset / mAnchorPoint;
+            ViewCompat.setTranslationY(mParallaxView, offset * slideRange * -1);
         }
     }
-    
-    public static int screenHeight(Context context){
-        DisplayMetrics dm = new DisplayMetrics();
-        ((WindowManager)(context.getSystemService(Context.WINDOW_SERVICE))).getDefaultDisplay().getMetrics(dm);
-        int screenWidth = dm.widthPixels;
-        int screenHeight = dm.heightPixels;
-        return screenHeight;
-    }
-    
-    public static int dip2px(Context context, float dpValue) {
-        final float scale = context.getResources().getDisplayMetrics().density;
-        return (int) (dpValue * scale + 0.5f);
-    }
-    
-    private int preRange;
 
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {

@@ -1,8 +1,7 @@
 package com.sothree.slidinguppanel.demo;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -16,7 +15,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
-public class DemoActivity extends ActionBarActivity {
+public class DemoActivity extends Activity {
     private static final String TAG = "DemoActivity";
     private static final float ANCHOR_OFFSET = 0.60f;
 
@@ -28,15 +27,18 @@ public class DemoActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
+    
+        int height = this.getWindowManager().getDefaultDisplay().getHeight();
+        Log.d("height", "Window height >>>>>>>>>>>>>>>>>>>>>>>>" + height);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+//        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
     
 //        initLv();
     
 //        mImageView = (ImageView) findViewById(R.id.ivDemo);
         
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        mLayout.setParallaxOffset(500);
+//        mLayout.setParallaxOffset(500);
         mLayout.addPanelSlideListener(new PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -120,21 +122,21 @@ public class DemoActivity extends ActionBarActivity {
 //
 //        lv.setAdapter(arrayAdapter);
     }
-    
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.demo, menu);
-        MenuItem item = menu.findItem(R.id.action_toggle);
-        if (mLayout != null) {
-            if (mLayout.getPanelState() == PanelState.HIDDEN) {
-                item.setTitle(R.string.action_show);
-            } else {
-                item.setTitle(R.string.action_hide);
-            }
-        }
-        return true;
-    }
+//
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.demo, menu);
+//        MenuItem item = menu.findItem(R.id.action_toggle);
+//        if (mLayout != null) {
+//            if (mLayout.getPanelState() == PanelState.HIDDEN) {
+//                item.setTitle(R.string.action_show);
+//            } else {
+//                item.setTitle(R.string.action_hide);
+//            }
+//        }
+//        return true;
+//    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
