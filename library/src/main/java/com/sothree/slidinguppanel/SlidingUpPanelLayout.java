@@ -368,7 +368,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         mMainView = findViewWithTag("main");
         mSlideableView = findViewWithTag("sliding");
         mParallaxView = findViewWithTag("parallax");
-        
     }
 
     public void setGravity(int gravity) {
@@ -872,7 +871,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             final int childHeight = child.getMeasuredHeight();
             int childTop = paddingTop;
-
+            int childBottom;
+            int childLeft  ;
+            int childRight ;
+    
             if (child == mSlideableView) {
                 childTop = computePanelTopPosition(mSlideOffset);
                 Log.d("childTop", "mSlideableView >>top" + childTop);
@@ -891,9 +893,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     childTop = computePanelTopPosition(mSlideOffset) + mSlideableView.getMeasuredHeight();
                 }
             }
-            final int childBottom = childTop + childHeight;
-            final int childLeft = paddingLeft + lp.leftMargin;
-            final int childRight = childLeft + child.getMeasuredWidth();
+            childBottom  = childTop + childHeight;
+            childLeft    = paddingLeft + lp.leftMargin;
+            childRight   = childLeft + child.getMeasuredWidth();
 
             child.layout(childLeft, childTop, childRight, childBottom);
         }
@@ -1221,16 +1223,23 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mMainView.requestLayout();
         }
     
-        if (mSlideOffset > 0) {
-//            int slideRange = getHeight() + mParallaxView.getMeasuredHeight() ;
+        if (mSlideOffset < mAnchorPoint) {
             Log.d("height", "getHeight >>>" + getHeight());
             Log.d("height", "getPanelHeight >>>" + getPanelHeight());
             Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
             Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
-            int slideRange = Math.abs(computePanelTopPosition(0) + computePanelTopPosition(1f));
-            float offset = mSlideOffset / mAnchorPoint;
-            ViewCompat.setTranslationY(mParallaxView, offset * slideRange * -1);
+            ViewCompat.setTranslationY(mParallaxView, computeParallaxViewY() * -1);
         }
+    }
+    
+    private float computeParallaxViewY(){
+        final int collapsedTop = computePanelTopPosition(0);
+        final int expandedTop  = computePanelTopPosition(1);
+        Log.d("top", "collapsedTop >>>" + collapsedTop);
+        Log.d("top", "expandedTop >>>" + expandedTop);
+        int slideRange = Math.abs(expandedTop + collapsedTop);
+        float offset = mSlideOffset / mAnchorPoint;
+        return offset * slideRange;
     }
 
     @Override
@@ -1241,14 +1250,25 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (mSlideableView != null && mSlideableView != child) { // if main view
             // Clip against the slider; no sense drawing what will immediately be covered,
             // Unless the panel is set to overlay content
+    
             canvas.getClipBounds(mTmpRect);
+            
+            // ▼ //idea mOverlayContent 属性的设置,实际影响此段代码 xiaoyee ▼
             if (!mOverlayContent) {
+                //idea 按照文档的说法,如果设置这个属性为 true,那么就会将 slideable view 悬浮(遮盖、附加一层)在 main view 之上(目前),目前仅用在需要 slideable view 需要半透明时
+                //idea 如果不需要半透明,建议使用默认设置,也就是此属性设置为 false,降低过度绘制
                 if (mIsSlidingUp) {
-                    mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());
+                    if (child == mParallaxView) {
+                        mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());
+                    } else {
+                        mTmpRect.bottom = (int) Math.min(mTmpRect.bottom, mParallaxView.getTop() - computeParallaxViewY());
+                    }
                 } else {
                     mTmpRect.top = Math.max(mTmpRect.top, mSlideableView.getBottom());
                 }
             }
+            // ▲ //idea mOverlayContent 属性的设置,实际影响此段代码 xiaoyee ▲
+            
             if (mClipPanel) {
                 canvas.clipRect(mTmpRect);
             }
@@ -1307,8 +1327,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     @Override
     public void draw(Canvas c) {
         super.draw(c);
-
-        // draw the shadow
+        
+        //idea 绘制阴影; 阴影的绘制要晚于背景、主体及前景的绘制,所以放在此处
         if (mShadowDrawable != null && mSlideableView != null) {
             final int right = mSlideableView.getRight();
             final int top;

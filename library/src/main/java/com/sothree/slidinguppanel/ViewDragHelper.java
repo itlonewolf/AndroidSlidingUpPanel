@@ -1173,7 +1173,7 @@ public class ViewDragHelper {
 
                     saveLastMotion(ev);
                 } else {
-                    //todo 目前不知道什么情况下会走此状态
+                    //idea 目前是"从锚点位置 move, 或者展开状态向下 move"时会走此逻辑
                     Log.w("vgh", "卧槽,走了这个逻辑,赶紧看看");
                     
                     // Check to see if any pointer is now over a draggable view.
