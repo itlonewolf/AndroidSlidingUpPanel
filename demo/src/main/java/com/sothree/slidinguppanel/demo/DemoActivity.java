@@ -18,7 +18,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
 public class DemoActivity extends ActionBarActivity {
     private static final String TAG = "DemoActivity";
-    private static final float ANCHOR_OFFSET = 0.75f;
+    private static final float ANCHOR_OFFSET = 0.60f;
 
     private SlidingUpPanelLayout mLayout;
     

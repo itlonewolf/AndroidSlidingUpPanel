@@ -14,11 +14,9 @@ import android.support.annotation.FloatRange;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
@@ -162,6 +160,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * The main view
      */
     private View mMainView;
+    
+    private View mParallaxView;
 
     /**
      * Current state of the slideable view.
@@ -362,6 +362,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (mScrollableViewResId != -1) {
             setScrollableView(findViewById(mScrollableViewResId));
         }
+    
+        mMainView = findViewWithTag("main");
+        mSlideableView = findViewWithTag("sliding");
+        mParallaxView = findViewWithTag("parallax");
+        
     }
 
     public void setGravity(int gravity) {
@@ -741,12 +746,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         final int childCount = getChildCount();
 
-        if (childCount != 2) {
-            throw new IllegalStateException("Sliding up panel layout must have exactly 2 children!");
-        }
+//        if (childCount != 2) {
+//            throw new IllegalStateException("Sliding up panel layout must have exactly 2 children!");
+//        }
 
-        mMainView = getChildAt(0);
-        mSlideableView = getChildAt(1);
+//        mMainView = getChildAt(0);
+//        mSlideableView = getChildAt(1);
         if (mDragView == null) {
             setDragView(mSlideableView);
         }
@@ -786,6 +791,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 // See https://github.com/umano/AndroidSlidingUpPanel/issues/412.
                 //idea  wrap_content 和 match_parent 且未设置 weigth 时,需要去除 top_margin
                 height -= lp.topMargin;
+                Log.d("height", "---------mSlideableView >>> height " + height);
+            } else if (child == mParallaxView) {
+                height = Math.abs(computePanelTopPosition(1) - computePanelTopPosition(mAnchorPoint));
+                Log.d("height", "mParallaxView >>> height " + height);
             }
 
             int childWidthSpec;
@@ -799,6 +808,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
 
             int childHeightSpec;
+    
             if (lp.height == LayoutParams.WRAP_CONTENT) {
                 childHeightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.AT_MOST);
             } else {
@@ -863,6 +873,15 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             if (child == mSlideableView) {
                 childTop = computePanelTopPosition(mSlideOffset);
+                Log.d("childTop", "mSlideableView >>top" + childTop);
+                
+            }
+            if (child == mParallaxView) {
+                childTop = computePanelTopPosition(mSlideOffset);
+                if (mSlideOffset > 0) {
+                    childTop -= (int) ((mParallaxView.getMeasuredHeight() * mSlideOffset));
+                    Log.d("childTop", "mParallaxView >>top" + childTop);
+                }
             }
 
             if (!mIsSlidingUp) {
@@ -1157,6 +1176,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         PanelState oldState = mSlideState;
         mSlideState = state;
         dispatchOnPanelStateChanged(this, oldState, state);
+        //idea panel 状态切换为 ANCHORED 时,需要刷新位置
     }
 
     /**
@@ -1171,6 +1191,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     private void onPanelDragged(int newTop) {
+    
+        Log.d("height", "onPanelDragged >>> new Top:" + newTop);
         if (mSlideState != PanelState.DRAGGING) {
             mLastNotDraggingSlideState = mSlideState;
         }
@@ -1196,7 +1218,37 @@ public class SlidingUpPanelLayout extends ViewGroup {
             lp.height = LayoutParams.MATCH_PARENT;
             mMainView.requestLayout();
         }
+    
+        if (mSlideOffset > 0) {
+            preRange = mSlideRange;
+            if (preRange < mSlideRange) {
+                preRange = mSlideRange;
+            }
+//            int slideRange =  1920 - getPanelHeight();
+            int slideRange = 1920 + mParallaxView.getMeasuredHeight() ;
+//            int slideRange = getHeight() + mParallaxView.getMeasuredHeight() ;
+            Log.d("height", "getHeight >>>" + getHeight());
+            Log.d("height", "getPanelHeight >>>" + getPanelHeight());
+            Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
+//            int slideRange = Math.abs(computePanelTopPosition(0) + computePanelTopPosition(1f)) + mParallaxView.getMeasuredHeight();
+            ViewCompat.setTranslationY(mParallaxView, mSlideOffset * slideRange * -1);
+        }
     }
+    
+    public static int screenHeight(Context context){
+        DisplayMetrics dm = new DisplayMetrics();
+        ((WindowManager)(context.getSystemService(Context.WINDOW_SERVICE))).getDefaultDisplay().getMetrics(dm);
+        int screenWidth = dm.widthPixels;
+        int screenHeight = dm.heightPixels;
+        return screenHeight;
+    }
+    
+    public static int dip2px(Context context, float dpValue) {
+        final float scale = context.getResources().getDisplayMetrics().density;
+        return (int) (dpValue * scale + 0.5f);
+    }
+    
+    private int preRange;
 
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
@@ -1433,6 +1485,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 // settle at the bottom
                 target = computePanelTopPosition(0.0f);
             }
+    
+            Log.d("height", "onViewReleased >>> target " + target);
 
             if (mDragHelper != null) {
                 mDragHelper.settleCapturedViewAt(releasedChild.getLeft(), target);
