@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.FloatRange;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
@@ -183,11 +184,15 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * How far the panel is offset from its expanded position.
      * range [0, 1] where 0 = collapsed, 1 = expanded.
+     * 0 代表完全收起; 1 代表完全展开
+     * //idea 为啥要使用比例而不是直接的数值?
+     * //idea 比例适用范围更广,而且在与其他动作进行并发时,可以很容易的进行变换,不论是距离类型的动
      */
     private float mSlideOffset;
 
     /**
      * How far in pixels the slideable panel may move.
+     * 从完全收起到完全展开之间的范围,以像素为单位
      */
     private int mSlideRange;
 
@@ -590,7 +595,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * @param anchorPoint A value between 0 and 1, determining the position of the anchor point
      *                    starting from the top of the layout.
      */
-    public void setAnchorPoint(float anchorPoint) {
+    public void setAnchorPoint(@FloatRange(from = 0,fromInclusive = false, to = 1.0f,toInclusive = true) float anchorPoint) {
         if (anchorPoint > 0 && anchorPoint <= 1) {
             mAnchorPoint = anchorPoint;
             mFirstLayout = true;
@@ -662,26 +667,28 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (getChildCount() == 0) {
             return;
         }
-        final int leftBound = getPaddingLeft();
-        final int rightBound = getWidth() - getPaddingRight();
-        final int topBound = getPaddingTop();
+        final int leftBound   = getPaddingLeft();
+        final int rightBound  = getWidth() - getPaddingRight();
+        final int topBound    = getPaddingTop();
         final int bottomBound = getHeight() - getPaddingBottom();
+        
         final int left;
         final int right;
         final int top;
         final int bottom;
+        
         if (mSlideableView != null && hasOpaqueBackground(mSlideableView)) {
-            left = mSlideableView.getLeft();
-            right = mSlideableView.getRight();
-            top = mSlideableView.getTop();
-            bottom = mSlideableView.getBottom();
+            left    = mSlideableView.getLeft();
+            right   = mSlideableView.getRight();
+            top     = mSlideableView.getTop();
+            bottom  = mSlideableView.getBottom();
         } else {
             left = right = top = bottom = 0;
         }
         View child = getChildAt(0);
-        final int clampedChildLeft = Math.max(leftBound, child.getLeft());
-        final int clampedChildTop = Math.max(topBound, child.getTop());
-        final int clampedChildRight = Math.min(rightBound, child.getRight());
+        final int clampedChildLeft   = Math.max(leftBound,   child.getLeft());
+        final int clampedChildTop    = Math.max(topBound,    child.getTop());
+        final int clampedChildRight  = Math.min(rightBound,  child.getRight());
         final int clampedChildBottom = Math.min(bottomBound, child.getBottom());
         final int vis;
         if (clampedChildLeft >= left && clampedChildTop >= top &&
@@ -722,8 +729,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-        final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         final int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         if (widthMode != MeasureSpec.EXACTLY && widthMode != MeasureSpec.AT_MOST) {
@@ -749,6 +756,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mSlideState = PanelState.HIDDEN;
         }
 
+        //idea 去掉上下左右的 padding
         int layoutHeight = heightSize - getPaddingTop() - getPaddingBottom();
         int layoutWidth = widthSize - getPaddingLeft() - getPaddingRight();
 
@@ -766,13 +774,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
             int width = layoutWidth;
             if (child == mMainView) {
                 if (!mOverlayContent && mSlideState != PanelState.HIDDEN) {
+                    //idea panel 非隐藏状态时,main view 的高度等于父控件的高度减去 mPanelHeight
                     height -= mPanelHeight;
                 }
+                //idea panel 隐藏状态时,main view 的高度其实也等于父控件的高度减去 panel 显示的高度(但是 mPanelHeight 并不等于 panel 显示的高度)
 
+                //idea main view 的宽度要去掉左右 margin
                 width -= lp.leftMargin + lp.rightMargin;
             } else if (child == mSlideableView) {
                 // The slideable view should be aware of its top margin.
                 // See https://github.com/umano/AndroidSlidingUpPanel/issues/412.
+                //idea  wrap_content 和 match_parent 且未设置 weigth 时,需要去除 top_margin
                 height -= lp.topMargin;
             }
 
@@ -782,6 +794,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             } else if (lp.width == LayoutParams.MATCH_PARENT) {
                 childWidthSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
             } else {
+                //idea 如果指定了确切的值,那么就设置为确切的值
                 childWidthSpec = MeasureSpec.makeMeasureSpec(lp.width, MeasureSpec.EXACTLY);
             }
 
@@ -791,8 +804,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             } else {
                 // Modify the height based on the weight.
                 if (lp.weight > 0 && lp.weight < 1) {
+                    //idea 如果设置了 weight,那么就按照 weight 计算高度
                     height = (int) (height * lp.weight);
                 } else if (lp.height != LayoutParams.MATCH_PARENT) {
+                    //idea 既没设置 weight 又不是 match_parent,那么应该是设置了确切的值,那么直接使用确切值
                     height = lp.height;
                 }
                 childHeightSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
@@ -815,6 +830,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         final int childCount = getChildCount();
 
+        //idea 大小变化\第一次进来计算,其他情况不计算
         if (mFirstLayout) {
             switch (mSlideState) {
                 case EXPANDED:
@@ -909,6 +925,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
 
             case MotionEvent.ACTION_MOVE: {
+                //idea 判断为倾向于横向滑动
                 if (ady > dragSlop && adx > ady) {
                     mDragHelper.cancel();
                     mIsUnableToDrag = true;
@@ -967,10 +984,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
         
         if (action == MotionEvent.ACTION_DOWN) {
             
-            if (!isViewUnder(mDragView, (int) x, (int) y)) {
-                Log.d("sliding", "dispatchTouchEvent >>> 不在 mdragview 区域中");
-                return false;
-            }
+//            if (!isViewUnder(mDragView, (int) x, (int) y)) {
+//                //idea 不在 dragview 的区域时,不做处理
+//                return false;
+//            }
             
             mIsScrollableViewHandlingTouch = false;
             mPrevMotionY = y;
@@ -985,9 +1002,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
 
             // Which direction (up or down) is the drag moving?
-            if (dy * (mIsSlidingUp ? 1 : -1) > 0) { // Collapsing
+            if (dy * (mIsSlidingUp ? 1 : -1) > 0) { // Collapsing //idea 意为收起(收起分为两种:1、向上收起,2、向下收起;由 gravity 指定)
                 // Is the child less than fully scrolled?
                 // Then let the child handle it.
+                //idea 比如手指往下滑动时,如果 listview 的第一条未到达顶部,那么先交给 listview 让其自己先滑动到顶部
                 if (mScrollableViewHelper.getScrollableViewScrollPosition(mScrollableView, mIsSlidingUp) > 0) {
                     mIsScrollableViewHandlingTouch = true;
                     return super.dispatchTouchEvent(ev);
@@ -996,23 +1014,30 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 // Was the child handling the touch previously?
                 // Then we need to rejigger things so that the
                 // drag panel gets a proper down event.
+                //idea 比如上次 listview 的第一条未到达顶部,这次已经到达了,那么现在要交给 parent 来处理了,需要告诉子 view CANCEL 掉后续事件
+                //idea 此段代码使过度更加顺畅,不会有卡顿;
+                //idea 过度阶段:下滑 listview 时,先滚动 listview 内部,然后将 listview 外部整个滚动
                 if (mIsScrollableViewHandlingTouch) {
                     // Send an 'UP' event to the child.
+                    // ▼ //idea 这段重要 xiaoyee ▼
                     MotionEvent up = MotionEvent.obtain(ev);
                     up.setAction(MotionEvent.ACTION_CANCEL);
                     super.dispatchTouchEvent(up);
                     up.recycle();
+                    // ▲ //idea 这段重要 xiaoyee ▲
 
                     // Send a 'DOWN' event to the panel. (We'll cheat
                     // and hijack this one)
+                    //todo 目前测试时去除掉此行也并未造成明显影响
                     ev.setAction(MotionEvent.ACTION_DOWN);
                 }
 
                 mIsScrollableViewHandlingTouch = false;
                 return this.onTouchEvent(ev);
-            } else if (dy * (mIsSlidingUp ? 1 : -1) < 0) { // Expanding
+            } else if (dy * (mIsSlidingUp ? 1 : -1) < 0) { // Expanding //idea 展开状态
                 // Is the panel less than fully expanded?
                 // Then we'll handle the drag here.
+                //idea 尚未完全展开时,由自己先把它展开
                 if (mSlideOffset < 1.0f) {
                     mIsScrollableViewHandlingTouch = false;
                     return this.onTouchEvent(ev);
@@ -1053,7 +1078,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 screenY >= viewLocation[1] && screenY < viewLocation[1] + view.getHeight();
     }
 
-    /*
+    /**
      * Computes the top position of the panel based on the slide offset.
      */
     private int computePanelTopPosition(float slideOffset) {
@@ -1065,7 +1090,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 : getPaddingTop() - slidingViewHeight + mPanelHeight + slidePixelOffset;
     }
 
-    /*
+    /**
      * Computes the slide offset based on the top position of the panel
      */
     private float computeSlideOffset(int topPosition) {
@@ -1175,8 +1200,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
-        boolean result;
-        final int save = canvas.save(Canvas.CLIP_SAVE_FLAG);
+        boolean                                  result;
+        @SuppressLint("WrongConstant") final int save = canvas.save(Canvas.CLIP_SAVE_FLAG);
 
         if (mSlideableView != null && mSlideableView != child) { // if main view
             // Clip against the slider; no sense drawing what will immediately be covered,
@@ -1381,7 +1406,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
-            int target = 0;
+            int target;
 
             // direction is always positive if we are sliding in the expanded direction
             float direction = mIsSlidingUp ? -yvel : yvel;

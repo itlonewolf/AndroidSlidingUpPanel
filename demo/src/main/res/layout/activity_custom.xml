@@ -19,36 +19,66 @@
             android:onClick="frameClick"
     />
 
-    <com.sothree.slidinguppanel.demo.DragableView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-    >
+    <ImageView android:layout_width="100dp"
+               android:layout_height="100dp"
+    android:src="@drawable/ic_launcher"
+    />
+    <!--<com.sothree.slidinguppanel.demo.DragableView-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent"-->
+    <!--&gt;-->
 
-        <TextView
-                android:id="@+id/dragable_v"
-                android:layout_margin="10dp"
-                android:background="#44ff0000"
-                android:gravity="center"
-                android:layout_gravity="top"
-                android:text="I can be dragged !top"
-                android:layout_width="100dp"
-                android:layout_height="100dp"/>
-        <ListView
-                android:id="@+id/list"
-                android:tag="dragable_v"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom">
-        </ListView>
+        <!--&lt;!&ndash;<LinearLayout android:layout_width="match_parent"&ndash;&gt;-->
+                     <!--&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;-->
+                     <!--&lt;!&ndash;android:tag="dragable_v"&ndash;&gt;-->
+                      <!--&lt;!&ndash;android:orientation="horizontal"&ndash;&gt;-->
+        <!--&lt;!&ndash;&gt;&ndash;&gt;-->
+
+
+            <!--&lt;!&ndash;&lt;!&ndash;<ListView&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;android:id="@+id/list"&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;android:layout_width="match_parent"&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;android:tag="dragable_v"&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;android:layout_height="wrap_content"&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;android:layout_gravity="bottom">&ndash;&gt;&ndash;&gt;-->
+            <!--&lt;!&ndash;&lt;!&ndash;</ListView>&ndash;&gt;&ndash;&gt;-->
+
+            <!--&lt;!&ndash;<TextView&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:id="@+id/dragable_v"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_margin="10dp"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:background="#44ff0000"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:gravity="center"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_gravity="top"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:text="I can be dragged !top"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_width="100dp"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_height="100dp"/>&ndash;&gt;-->
+            <!--&lt;!&ndash;<TextView&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:id="@+id/dragable_vs"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_margin="10dp"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:background="#44ff0000"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:gravity="center"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_gravity="left"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:text="I can be dragged !top"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_width="100dp"&ndash;&gt;-->
+                    <!--&lt;!&ndash;android:layout_height="100dp"/>&ndash;&gt;-->
+        <!--&lt;!&ndash;</LinearLayout>&ndash;&gt;-->
+
+        <!--<ListView-->
+                <!--android:id="@+id/list"-->
+                <!--android:tag="dragable_v"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="bottom">-->
+        <!--</ListView>-->
 
         <!--<TextView-->
                 <!--android:layout_margin="10dp"-->
                 <!--android:layout_gravity="bottom|right"-->
                 <!--android:gravity="center"-->
                 <!--android:background="#44ff0000"-->
-                <!--android:text="I cannot be dragged !bottom"-->
-                <!--android:layout_width="100dp"-->
-                <!--android:layout_height="100dp"/>-->
-    </com.sothree.slidinguppanel.demo.DragableView>
+                <!--android:text="demo"-->
+                <!--android:layout_width="50dp"-->
+                <!--android:layout_height="50dp"/>-->
+    <!--</com.sothree.slidinguppanel.demo.DragableView>-->
 
 </FrameLayout>
