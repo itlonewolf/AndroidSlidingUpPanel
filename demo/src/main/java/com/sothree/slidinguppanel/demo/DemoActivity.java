@@ -1,22 +1,17 @@
 package com.sothree.slidinguppanel.demo;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.TextView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
-public class DemoActivity extends ActionBarActivity {
+public class DemoActivity extends Activity {
     private static final String TAG = "DemoActivity";
     private static final float ANCHOR_OFFSET = 0.6f;
 
@@ -32,7 +27,7 @@ public class DemoActivity extends ActionBarActivity {
         int height = this.getWindowManager().getDefaultDisplay().getHeight();
         Log.d("height", "Window height >>>>>>>>>>>>>>>>>>>>>>>>" + height);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+//        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
     
 //        initLv();
     
@@ -61,11 +56,11 @@ public class DemoActivity extends ActionBarActivity {
         });
         mLayout.setAnchorPoint(ANCHOR_OFFSET);
 
-        TextView t = (TextView) findViewById(R.id.name);
-        t.setText(Html.fromHtml(getString(R.string.hello)));
-        Button f = (Button) findViewById(R.id.follow);
-        f.setText(Html.fromHtml(getString(R.string.follow)));
-        f.setMovementMethod(LinkMovementMethod.getInstance());
+//        TextView t = (TextView) findViewById(R.id.name);
+//        t.setText(Html.fromHtml(getString(R.string.hello)));
+//        Button f = (Button) findViewById(R.id.follow);
+//        f.setText(Html.fromHtml(getString(R.string.follow)));
+//        f.setMovementMethod(LinkMovementMethod.getInstance());
 //        f.setOnClickListener(new OnClickListener() {
 //            @Override
 //            public void onClick(View v) {

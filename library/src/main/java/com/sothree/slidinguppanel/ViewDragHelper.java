@@ -1037,6 +1037,7 @@ public class ViewDragHelper {
                     }
                 } else if (mDragState == STATE_SETTLING) {
                     //issue 为啥在"另一个手指按下的时候还要尝试捕获正处于 setting 状态的 view",有这种可能么
+                    Log.w("touch", "有一个手指处于按下状态,现在又有一个手机按下了,但是拖动状态竟然是 settling");
                     // Catch a settling view if possible.
                     final View toCapture = findTopChildUnder((int) x, (int) y);
                     if (toCapture == mCapturedView) {
@@ -1173,7 +1174,7 @@ public class ViewDragHelper {
 
                     saveLastMotion(ev);
                 } else {
-                    //idea 目前是"从锚点位置 move, 或者展开状态向下 move"时会走此逻辑
+                    //idea 目前是"从锚点位置 move, 或者展开状态向下 move"时会走此逻辑;拖动 sliding view 外部区域时也会走此逻辑
                     Log.w("vgh", "卧槽,走了这个逻辑,赶紧看看");
                     
                     // Check to see if any pointer is now over a draggable view.

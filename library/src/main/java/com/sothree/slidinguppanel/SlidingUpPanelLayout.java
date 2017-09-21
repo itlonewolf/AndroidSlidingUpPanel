@@ -230,7 +230,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * instance state save/restore.
      */
     private boolean mFirstLayout = true;
-
+    
+    /**
+     * 裁切遮盖部分时使用的 rect 对象
+     */
     private final Rect mTmpRect = new Rect();
 
     /**
@@ -368,6 +371,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
         mMainView = findViewWithTag("main");
         mSlideableView = findViewWithTag("sliding");
         mParallaxView = findViewWithTag("parallax");
+    
+        if (mSlideableView == null) {
+            throw new IllegalStateException("必须指定 slideable view");
+        }
+    
+        Log.d("inflate", "onFinishInflate");
     }
 
     public void setGravity(int gravity) {
@@ -408,6 +417,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     public boolean isTouchEnabled() {
+        Log.d("dispatch", String.format("mIsTouchEnabled: %s, mSlideableView != null:%s, mSlideState != PanelState.HIDDEN:%s", mIsTouchEnabled, mSlideableView != null, mSlideState != PanelState.HIDDEN));
         return mIsTouchEnabled && mSlideableView != null && mSlideState != PanelState.HIDDEN;
     }
 
@@ -668,15 +678,29 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
         sendAccessibilityEvent(AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED);
     }
-
+    
+    /**
+     * 更新被遮盖住的 view 的显示状态
+     */
     void updateObscuredViewVisibility() {
-        if (getChildCount() == 0) {
+        //idea SUP 初衷应该是在 sliding view 完全遮挡住 main view 时,将 main view 设置为 INVISIBLE,目前只对 main view 做支持
+        if (mMainView == null) {
             return;
         }
+    
+        final int height = getHeight();
+        final int width  = getWidth();
+    
+        //1865,1080
+        Log.d("update", String.format("height:%s, width:%s", height, width));
+        
         final int leftBound   = getPaddingLeft();
-        final int rightBound  = getWidth() - getPaddingRight();
         final int topBound    = getPaddingTop();
-        final int bottomBound = getHeight() - getPaddingBottom();
+        final int rightBound  = width - getPaddingRight();
+        final int bottomBound = height - getPaddingBottom();
+    
+        //0,1080,1678,3543
+        Log.d("update", String.format("leftBound:%s, topBound:%s, rightBound:%s, bottomBound:%s", leftBound, topBound, rightBound, bottomBound));
         
         final int left;
         final int right;
@@ -685,20 +709,28 @@ public class SlidingUpPanelLayout extends ViewGroup {
         
         if (mSlideableView != null && hasOpaqueBackground(mSlideableView)) {
             left    = mSlideableView.getLeft();
-            right   = mSlideableView.getRight();
             top     = mSlideableView.getTop();
+            right   = mSlideableView.getRight();
             bottom  = mSlideableView.getBottom();
         } else {
             left = right = top = bottom = 0;
         }
-        View child = getChildAt(0);
+        //0,1080,1678,3545
+        Log.d("update", String.format("left:%s, top:%s, top:%s, bottom:%s", left, top, right, bottom));
+        View child = mMainView;
         final int clampedChildLeft   = Math.max(leftBound,   child.getLeft());
         final int clampedChildTop    = Math.max(topBound,    child.getTop());
         final int clampedChildRight  = Math.min(rightBound,  child.getRight());
         final int clampedChildBottom = Math.min(bottomBound, child.getBottom());
+        
+        //0,1678,1080,1865
+        Log.d("update", String.format("clampedChildLeft:%s, clampedChildTop:%s, clampedChildRight:%s, clampedChildBottom:%s", clampedChildLeft, clampedChildTop, clampedChildRight, clampedChildBottom));
+        
         final int vis;
         if (clampedChildLeft >= left && clampedChildTop >= top &&
                 clampedChildRight <= right && clampedChildBottom <= bottom) {
+            //idea 如果完全被挡住了,那么就设置为 INVISIBLE
+            Log.d("update", "set child invisible");
             vis = INVISIBLE;
         } else {
             vis = VISIBLE;
@@ -714,7 +746,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
         }
     }
-
+    
+    /**
+     * 是否有一个不透明的背景
+     */
     private static boolean hasOpaqueBackground(View v) {
         final Drawable bg = v.getBackground();
         return bg != null && bg.getOpacity() == PixelFormat.OPAQUE;
@@ -759,6 +794,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         // If the sliding panel is not visible, then put the whole view in the hidden state
         if (mSlideableView.getVisibility() != VISIBLE) {
+            Log.w("measure", "mSlideableView >>> not visible");
             mSlideState = PanelState.HIDDEN;
         }
 
@@ -851,7 +887,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     mSlideOffset = mAnchorPoint;
                     break;
                 case HIDDEN:
-                    int newTop = computePanelTopPosition(0.0f) + (mIsSlidingUp ? +mPanelHeight : -mPanelHeight);
+                    int newTop = computePanelTopPosition(0.0f) + (mIsSlidingUp ? + mPanelHeight : -mPanelHeight);
                     mSlideOffset = computeSlideOffset(newTop);
                     break;
                 default:
@@ -866,8 +902,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             // Always layout the sliding view on the first layout
             if (child.getVisibility() == GONE && (i == 0 || mFirstLayout)) {
+                Log.d("layout", "onlayout visible gone");
                 continue;
             }
+    
+            Log.d("layout", "into layout sure");
 
             final int childHeight = child.getMeasuredHeight();
             int childTop = paddingTop;
@@ -998,12 +1037,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
         final int action = MotionEventCompat.getActionMasked(ev);
 
         if (!isEnabled() || !isTouchEnabled() || (mIsUnableToDrag && action != MotionEvent.ACTION_DOWN)) {
+            Log.d("dispatch", String.format("isEnabled: %s, isTouchEnabled:%s, mIsUnableToDrag:%s", isEnabled(), isTouchEnabled(), mIsUnableToDrag));
             mDragHelper.abort();
             return super.dispatchTouchEvent(ev);
         }
     
         final float x = ev.getX();
         final float y = ev.getY();
+        Log.d("dispatch", "dispatchTouchEvent >>>");
         
         if (action == MotionEvent.ACTION_DOWN) {
             
@@ -1014,10 +1055,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
             
             mIsScrollableViewHandlingTouch = false;
             mPrevMotionY = y;
+    
+            Log.d("dispatch", "dispatchTouchEvent >>> ACTION_DOWN");
         } else if (action == MotionEvent.ACTION_MOVE) {
             float dy = y - mPrevMotionY;
             mPrevMotionY = y;
-
+    
+            Log.d("dispatch", "dispatchTouchEvent >>> ACTION_MOVE");
             // If the scroll view isn't under the touch, pass the
             // event along to the dragView.
             if (!isViewUnder(mScrollableView, (int) mInitialMotionX, (int) mInitialMotionY)) {
@@ -1188,7 +1232,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     @SuppressLint("NewApi")
     private void applyParallaxForCurrentSlideOffset() {
-        if (mParallaxOffset > 0) {
+        if (mParallaxOffset > 0 && mMainView != null) {
             int mainViewOffset = getCurrentParallaxOffset();
             ViewCompat.setTranslationY(mMainView, mainViewOffset);
         }
@@ -1206,21 +1250,23 @@ public class SlidingUpPanelLayout extends ViewGroup {
         applyParallaxForCurrentSlideOffset();
         // Dispatch the slide event
         dispatchOnPanelSlide(mSlideableView);
-        // If the slide offset is negative, and overlay is not on, we need to increase the
-        // height of the main content
-        LayoutParams lp = (LayoutParams) mMainView.getLayoutParams();
-        int defaultHeight = getHeight() - getPaddingBottom() - getPaddingTop() - mPanelHeight;
-
-        if (mSlideOffset <= 0 && !mOverlayContent) {
-            // expand the main view
-            lp.height = mIsSlidingUp ? (newTop - getPaddingBottom()) : (getHeight() - getPaddingBottom() - mSlideableView.getMeasuredHeight() - newTop);
-            if (lp.height == defaultHeight) {
+        if (mMainView != null) {
+            // If the slide offset is negative, and overlay is not on, we need to increase the
+            // height of the main content
+            LayoutParams lp = (LayoutParams) mMainView.getLayoutParams();
+            int defaultHeight = getHeight() - getPaddingBottom() - getPaddingTop() - mPanelHeight;
+        
+            if (mSlideOffset <= 0 && !mOverlayContent) {
+                // expand the main view
+                lp.height = mIsSlidingUp ? (newTop - getPaddingBottom()) : (getHeight() - getPaddingBottom() - mSlideableView.getMeasuredHeight() - newTop);
+                if (lp.height == defaultHeight) {
+                    lp.height = LayoutParams.MATCH_PARENT;
+                }
+                mMainView.requestLayout();
+            } else if (lp.height != LayoutParams.MATCH_PARENT && !mOverlayContent) {
                 lp.height = LayoutParams.MATCH_PARENT;
+                mMainView.requestLayout();
             }
-            mMainView.requestLayout();
-        } else if (lp.height != LayoutParams.MATCH_PARENT && !mOverlayContent) {
-            lp.height = LayoutParams.MATCH_PARENT;
-            mMainView.requestLayout();
         }
     
         if (mParallaxView != null) {
@@ -1250,6 +1296,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         @SuppressLint("WrongConstant") final int save = canvas.save(Canvas.CLIP_SAVE_FLAG);
 
         if (mSlideableView != null && mSlideableView != child) { // if main view
+            
             // Clip against the slider; no sense drawing what will immediately be covered,
             // Unless the panel is set to overlay content
     
@@ -1441,6 +1488,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 } else if (mSlideOffset == 0) {
                     setPanelStateInternal(PanelState.COLLAPSED);
                 } else if (mSlideOffset < 0) {
+                    Log.w("measure", "onViewDragStateChanged >>> mSlideOffset < 0e");
                     setPanelStateInternal(PanelState.HIDDEN);
                     mSlideableView.setVisibility(View.INVISIBLE);
                 } else {
