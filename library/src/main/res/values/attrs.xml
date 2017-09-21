@@ -7,8 +7,14 @@
         <attr name="umanoParallaxOffset" format="dimension" />
         <attr name="umanoFadeColor" format="color" />
         <attr name="umanoFlingVelocity" format="integer" />
+
         <attr name="umanoDragView" format="reference" />
         <attr name="umanoScrollableView" format="reference" />
+
+        <attr name="umanoMainView" format="reference" />
+        <attr name="umanoSlideableView" format="reference" />
+        <attr name="umanoParallaxView" format="reference" />
+
         <attr name="umanoOverlay" format="boolean"/>
         <attr name="umanoClipPanel" format="boolean"/>
         <attr name="umanoAnchorPoint" format="float" />

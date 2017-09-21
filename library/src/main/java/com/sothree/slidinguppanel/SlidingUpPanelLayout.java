@@ -157,13 +157,16 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * The child view that can slide, if any.
      */
     private View mSlideableView;
+    private int mSlideableViewResId = -1;
 
     /**
      * The main view
      */
     private View mMainView;
+    private int mMainViewResId = -1;
     
     private View mParallaxView;
+    private int mParallaxViewResId = -1;
 
     /**
      * Current state of the slideable view.
@@ -310,6 +313,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
                 mDragViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoDragView, -1);
                 mScrollableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoScrollableView, -1);
+    
+                mMainViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoMainView, -1);
+                mSlideableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoSlideableView, -1);
+                mParallaxViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoParallaxView, -1);
 
                 mOverlayContent = ta.getBoolean(R.styleable.SlidingUpPanelLayout_umanoOverlay, DEFAULT_OVERLAY_FLAG);
                 mClipPanel = ta.getBoolean(R.styleable.SlidingUpPanelLayout_umanoClipPanel, DEFAULT_CLIP_PANEL_FLAG);
@@ -361,16 +368,24 @@ public class SlidingUpPanelLayout extends ViewGroup {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
+        if (mMainViewResId != -1) {
+            mMainView = findViewById(mMainViewResId);
+        }
+    
+        if (mSlideableViewResId != -1) {
+            mSlideableView = findViewById(mSlideableViewResId);
+        }
+    
+        if (mParallaxViewResId != -1) {
+            mParallaxView = findViewById(mParallaxViewResId);
+        }
+        
         if (mDragViewResId != -1) {
             setDragView(findViewById(mDragViewResId));
         }
         if (mScrollableViewResId != -1) {
             setScrollableView(findViewById(mScrollableViewResId));
         }
-    
-        mMainView = findViewWithTag("main");
-        mSlideableView = findViewWithTag("sliding");
-        mParallaxView = findViewWithTag("parallax");
     
         if (mSlideableView == null) {
             throw new IllegalStateException("必须指定 slideable view");
