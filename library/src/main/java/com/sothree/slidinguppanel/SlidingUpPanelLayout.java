@@ -114,7 +114,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * Parallax offset
      */
-    private int mParallaxOffset = -1;
+    private int mMainViewParallaxOffset = -1;
 
     /**
      * True if the collapsed panel should be dragged up.
@@ -303,7 +303,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (ta != null) {
                 mPanelHeight = ta.getDimensionPixelSize(R.styleable.SlidingUpPanelLayout_umanoPanelHeight, -1);
                 mShadowHeight = ta.getDimensionPixelSize(R.styleable.SlidingUpPanelLayout_umanoShadowHeight, -1);
-                mParallaxOffset = ta.getDimensionPixelSize(R.styleable.SlidingUpPanelLayout_umanoParallaxOffset, -1);
+                mMainViewParallaxOffset = ta.getDimensionPixelSize(R.styleable.SlidingUpPanelLayout_umanoParallaxOffset, -1);
 
                 mMinFlingVelocity = ta.getInt(R.styleable.SlidingUpPanelLayout_umanoFlingVelocity, DEFAULT_MIN_FLING_VELOCITY);
                 mCoveredFadeColor = ta.getColor(R.styleable.SlidingUpPanelLayout_umanoFadeColor, DEFAULT_FADE_COLOR);
@@ -337,8 +337,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (mShadowHeight == -1) {
             mShadowHeight = (int) (DEFAULT_SHADOW_HEIGHT * density + 0.5f);
         }
-        if (mParallaxOffset == -1) {
-            mParallaxOffset = (int) (DEFAULT_PARALLAX_OFFSET * density);
+        if (mMainViewParallaxOffset == -1) {
+            mMainViewParallaxOffset = (int) (DEFAULT_PARALLAX_OFFSET * density);
         }
         // If the shadow height is zero, don't show the shadow
         if (mShadowHeight > 0) {
@@ -490,7 +490,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     public int getCurrentParallaxOffset() {
         // Clamp slide offset at zero for parallax computation;
-        int offset = (int) (mParallaxOffset * Math.max(mSlideOffset, 0));
+        int offset = (int) (mMainViewParallaxOffset * Math.max(mSlideOffset, 0));
         return mIsSlidingUp ? -offset : offset;
     }
 
@@ -499,8 +499,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
      *
      * @param val A height in pixels
      */
-    public void setParallaxOffset(int val) {
-        mParallaxOffset = val;
+    public void setMainViewParallaxOffset(int val) {
+        mMainViewParallaxOffset = val;
         if (!mFirstLayout) {
             requestLayout();
         }
@@ -1240,7 +1240,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     @SuppressLint("NewApi")
     private void applyParallaxForCurrentSlideOffset() {
-        if (mParallaxOffset > 0 && mMainView != null) {
+        if (mMainViewParallaxOffset > 0 && mMainView != null) {
             int mainViewOffset = getCurrentParallaxOffset();
             ViewCompat.setTranslationY(mMainView, mainViewOffset);
         }
@@ -1311,7 +1311,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             // ▼ //idea mOverlayContent 属性的设置,实际影响此段代码 xiaoyee ▼
             if (!mOverlayContent) {
                 //idea 按照文档的说法,如果设置这个属性为 true,那么就会将 slideable view 悬浮(遮盖、附加一层)在 main view 之上(目前),目前仅用在需要 slideable view 需要半透明时
-                //idea 如果不需要半透明,建议使用默认设置,也就是此属性设置为 false,降低过度绘制
+                //idea 如果 main view 不需要半透明,建议使用默认设置,也就是此属性设置为 false,降低过度绘制
                 if (mIsSlidingUp) {
                     if (mParallaxView == null || child == mParallaxView) {
                         mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());

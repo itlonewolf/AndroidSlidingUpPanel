@@ -45,13 +45,20 @@
             android:textSize="16sp" />
     </FrameLayout>
 
-    <ImageView
+    <LinearLayout
             android:id="@+id/parallaxView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/demo"
-            android:scaleType="centerCrop"
-    />
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+    >
+
+        <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@drawable/demo"
+                android:scaleType="centerCrop"
+        />
+    </LinearLayout>
 
     <!-- SLIDING LAYOUT -->
     <LinearLayout

@@ -1,7 +1,8 @@
 package com.sothree.slidinguppanel.demo;
 
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -15,7 +16,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
-public class DemoActivity extends Activity {
+public class DemoActivity extends ActionBarActivity {
     private static final String TAG = "DemoActivity";
     private static final float ANCHOR_OFFSET = 0.6f;
 
@@ -31,14 +32,15 @@ public class DemoActivity extends Activity {
         int height = this.getWindowManager().getDefaultDisplay().getHeight();
         Log.d("height", "Window height >>>>>>>>>>>>>>>>>>>>>>>>" + height);
 
-//        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
     
 //        initLv();
     
 //        mImageView = (ImageView) findViewById(R.id.ivDemo);
         
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-//        mLayout.setParallaxOffset(500);
+//        mLayout.setMainViewParallaxOffset(500);
+        mLayout.setCoveredFadeColor(0);
         mLayout.addPanelSlideListener(new PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
