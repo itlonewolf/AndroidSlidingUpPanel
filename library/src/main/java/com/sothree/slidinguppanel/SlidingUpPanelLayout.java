@@ -363,7 +363,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     /**
-     * Set the Drag View after the view is inflated
+     * 设置各个 view
      */
     @Override
     protected void onFinishInflate() {
@@ -935,11 +935,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 
             }
             if (child == mParallaxView) {
-                childTop = computePanelTopPosition(mSlideOffset);
-                if (mSlideOffset > 0) {
-                    childTop -= (int) ((mParallaxView.getMeasuredHeight() * mSlideOffset));
-                    Log.d("childTop", "mParallaxView >>top" + childTop);
-                }
+                childTop = (int) (computePanelTopPosition(mSlideOffset) + computeParallaxViewY());
             }
 
             if (!mIsSlidingUp) {
@@ -1290,19 +1286,23 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 Log.d("height", "getPanelHeight >>>" + getPanelHeight());
                 Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
                 Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
-                ViewCompat.setTranslationY(mParallaxView, computeParallaxViewY() * -1);
+//                ViewCompat.setTranslationY(mParallaxView, computeParallaxViewY());
+                mParallaxView.requestLayout();
             }
         }
     }
     
     private float computeParallaxViewY(){
-        final int collapsedTop = computePanelTopPosition(0);
-        final int expandedTop  = computePanelTopPosition(1);
-        Log.d("top", "collapsedTop >>>" + collapsedTop);
-        Log.d("top", "expandedTop >>>" + expandedTop);
-        int slideRange = Math.abs(expandedTop + collapsedTop);
+//        final int collapsedTop = computePanelTopPosition(0);
+//        final int expandedTop  = computePanelTopPosition(1);
+//        Log.d("top", "collapsedTop >>>" + collapsedTop);
+//        Log.d("top", "expandedTop >>>" + expandedTop);
+//        int slideRange = Math.abs(expandedTop + collapsedTop);
         float offset = mSlideOffset / mAnchorPoint;
-        return offset * slideRange;
+        offset = mIsSlidingUp ? -offset : offset;
+//        return offset * slideRange;
+        return offset * mParallaxView.getMeasuredHeight();
+    
     }
 
     @Override
