@@ -1223,12 +1223,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mMainView.requestLayout();
         }
     
-        if (mSlideOffset < mAnchorPoint) {
-            Log.d("height", "getHeight >>>" + getHeight());
-            Log.d("height", "getPanelHeight >>>" + getPanelHeight());
-            Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
-            Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
-            ViewCompat.setTranslationY(mParallaxView, computeParallaxViewY() * -1);
+        if (mParallaxView != null) {
+            if (mSlideOffset < mAnchorPoint) {
+                Log.d("height", "getHeight >>>" + getHeight());
+                Log.d("height", "getPanelHeight >>>" + getPanelHeight());
+                Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
+                Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
+                ViewCompat.setTranslationY(mParallaxView, computeParallaxViewY() * -1);
+            }
         }
     }
     
@@ -1258,7 +1260,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 //idea 按照文档的说法,如果设置这个属性为 true,那么就会将 slideable view 悬浮(遮盖、附加一层)在 main view 之上(目前),目前仅用在需要 slideable view 需要半透明时
                 //idea 如果不需要半透明,建议使用默认设置,也就是此属性设置为 false,降低过度绘制
                 if (mIsSlidingUp) {
-                    if (child == mParallaxView) {
+                    if (mParallaxView == null || child == mParallaxView) {
                         mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());
                     } else {
                         mTmpRect.bottom = (int) Math.min(mTmpRect.bottom, mParallaxView.getTop() - computeParallaxViewY());
