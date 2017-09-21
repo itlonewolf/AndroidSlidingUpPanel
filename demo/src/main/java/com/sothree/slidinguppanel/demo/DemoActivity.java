@@ -2,11 +2,15 @@ package com.sothree.slidinguppanel.demo;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.TextView;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
@@ -56,11 +60,11 @@ public class DemoActivity extends Activity {
         });
         mLayout.setAnchorPoint(ANCHOR_OFFSET);
 
-//        TextView t = (TextView) findViewById(R.id.name);
-//        t.setText(Html.fromHtml(getString(R.string.hello)));
-//        Button f = (Button) findViewById(R.id.follow);
-//        f.setText(Html.fromHtml(getString(R.string.follow)));
-//        f.setMovementMethod(LinkMovementMethod.getInstance());
+        TextView t = (TextView) findViewById(R.id.name);
+        t.setText(Html.fromHtml(getString(R.string.hello)));
+        Button f = (Button) findViewById(R.id.follow);
+        f.setText(Html.fromHtml(getString(R.string.follow)));
+        f.setMovementMethod(LinkMovementMethod.getInstance());
 //        f.setOnClickListener(new OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -71,13 +75,13 @@ public class DemoActivity extends Activity {
 //        });
     }
     
-    private void initLv() {
+//    private void initLv() {
 //        ListView lv = (ListView) findViewById(R.id.list);
 //        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-////                Toast.makeText(DemoActivity.this, "onItemClick", Toast.LENGTH_SHORT).show();
-//                startActivity(new Intent(DemoActivity.this, CustomActivity.class));
+//                Toast.makeText(DemoActivity.this, "onItemClick", Toast.LENGTH_SHORT).show();
+////                startActivity(new Intent(DemoActivity.this, CustomActivity.class));
 //            }
 //        });
 //
@@ -117,8 +121,10 @@ public class DemoActivity extends Activity {
 //                your_array_list );
 //
 //        lv.setAdapter(arrayAdapter);
-    }
-//
+//    }
+
+
+
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        // Inflate the menu; this adds items to the action bar if it is present.

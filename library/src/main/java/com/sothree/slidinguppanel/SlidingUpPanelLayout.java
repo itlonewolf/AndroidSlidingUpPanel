@@ -3,10 +3,7 @@ package com.sothree.slidinguppanel;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
+import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -1293,14 +1290,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
     
     private float computeParallaxViewY(){
-//        final int collapsedTop = computePanelTopPosition(0);
-//        final int expandedTop  = computePanelTopPosition(1);
-//        Log.d("top", "collapsedTop >>>" + collapsedTop);
-//        Log.d("top", "expandedTop >>>" + expandedTop);
-//        int slideRange = Math.abs(expandedTop + collapsedTop);
         float offset = mSlideOffset / mAnchorPoint;
         offset = mIsSlidingUp ? -offset : offset;
-//        return offset * slideRange;
         return offset * mParallaxView.getMeasuredHeight();
     
     }
@@ -1325,7 +1316,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     if (mParallaxView == null || child == mParallaxView) {
                         mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());
                     } else {
-                        mTmpRect.bottom = (int) Math.min(mTmpRect.bottom, mParallaxView.getTop() - computeParallaxViewY());
+                        mTmpRect.bottom = Math.min(mTmpRect.bottom, mParallaxView.getTop());
                     }
                 } else {
                     mTmpRect.top = Math.max(mTmpRect.top, mSlideableView.getBottom());
@@ -1387,7 +1378,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
             ViewCompat.postInvalidateOnAnimation(this);
         }
     }
-
+    
+    
+    static Paint mPaint = new Paint();
+    static {
+        mPaint.setColor(Color.RED);
+        mPaint.setTextSize(30);
+    }
+    
     @Override
     public void draw(Canvas c) {
         super.draw(c);
