@@ -943,7 +943,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             childBottom  = childTop + childHeight;
             childLeft    = paddingLeft + lp.leftMargin;
             childRight   = childLeft + child.getMeasuredWidth();
-
+    
+            if (child == mSlideableView) {
+                Log.d("onLayout", String.format("childLeft:%s, childTop:%s, childRight:%s, childBottom:%s, ", childLeft, childTop, childRight, childBottom));
+            }
             child.layout(childLeft, childTop, childRight, childBottom);
         }
 
@@ -1284,7 +1287,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
                 Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
 //                ViewCompat.setTranslationY(mParallaxView, computeParallaxViewY());
-                mParallaxView.requestLayout();
+//                mParallaxView.requestLayout();
             }
         }
     }
@@ -1528,7 +1531,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             // direction is always positive if we are sliding in the expanded direction
             float direction = mIsSlidingUp ? -yvel : yvel;
-
+    
+            Log.d("viewRelease", String.format("mSlideOffset:%s; mAnchorPoint:%s, direction:%s", mSlideOffset, mAnchorPoint, direction));
+            
             if (direction > 0 && mSlideOffset <= mAnchorPoint) {
                 // swipe up -> expand and stop at anchor point
                 target = computePanelTopPosition(mAnchorPoint);
@@ -1552,6 +1557,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 target = computePanelTopPosition(0.0f);
             }
     
+            Log.d("viewRelease", "onViewReleased >>> target " + target);
             Log.d("height", "onViewReleased >>> target " + target);
 
             if (mDragHelper != null) {

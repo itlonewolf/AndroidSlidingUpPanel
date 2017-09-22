@@ -2,6 +2,7 @@ package com.sothree.slidinguppanel.demo;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -31,7 +32,7 @@ public class DemoActivity extends ActionBarActivity {
         int height = this.getWindowManager().getDefaultDisplay().getHeight();
         Log.d("height", "Window height >>>>>>>>>>>>>>>>>>>>>>>>" + height);
 
-//        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
     
 //        initLv();
     

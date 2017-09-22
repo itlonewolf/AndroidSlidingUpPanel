@@ -603,6 +603,8 @@ public class ViewDragHelper {
      */
     private boolean forceSettleCapturedViewAt(int finalLeft, int finalTop, int xvel, int yvel) {
         Log.d("settle", "forceSettleCapturedViewAt");
+        Log.d("viewRelease", String.format("finalLeft:%s, findlTop:%s", finalLeft, finalTop));
+        
         final int startLeft = mCapturedView.getLeft();
         final int startTop = mCapturedView.getTop();
         final int dx = finalLeft - startLeft;
@@ -614,7 +616,8 @@ public class ViewDragHelper {
             setDragState(STATE_IDLE);
             return false;
         }
-
+    
+        Log.d("viewRelease", String.format("startLeft:%s, startTop:%s", startLeft, startTop));
         final int duration = computeSettleDuration(mCapturedView, dx, dy, xvel, yvel);
         mScroller.startScroll(startLeft, startTop, dx, dy, duration);
 
