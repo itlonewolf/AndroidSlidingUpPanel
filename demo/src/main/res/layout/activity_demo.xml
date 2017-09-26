@@ -7,7 +7,7 @@
         android:gravity="bottom"
         sothree:umanoPanelHeight="68dp"
         sothree:umanoShadowHeight="4dp"
-        sothree:umanoParallaxOffset="600dp"
+        sothree:umanoParallaxOffset="0dp"
         sothree:umanoDragView="@+id/slideableView"
         sothree:umanoOverlay="false"
         sothree:umanoScrollableView="@+id/sv"
@@ -66,7 +66,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#50ffffff"
+        android:background="#ffffff"
         android:orientation="vertical"
         android:clickable="true"
         android:focusable="false"

@@ -2,6 +2,7 @@ package com.sothree.slidinguppanel;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.content.res.TypedArray;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
@@ -932,7 +933,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 
             }
             if (child == mParallaxView) {
-                childTop = (int) (computePanelTopPosition(mSlideOffset) + computeParallaxViewY());
+                childTop = computePanelTopPosition(mSlideOffset);
+                Log.d("parallax", " on layout top:" + childTop);
+                Log.d("onLayout", "在 onLayout 方法中 mParallaxView 的 top >>>" + childTop);
             }
 
             if (!mIsSlidingUp) {
@@ -1162,7 +1165,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private int computePanelTopPosition(float slideOffset) {
         int slidingViewHeight = mSlideableView != null ? mSlideableView.getMeasuredHeight() : 0;
         int slidePixelOffset = (int) (slideOffset * mSlideRange);
+    
+        Log.d("parallax", String.format("slidingViewHeight : %s; slide range: %s", slidingViewHeight, mSlideRange));
+        
         // Compute the top of the panel if its collapsed
+    
+        Log.d("panelTopPosC", String.format("slidingViewHeight:%s,  measured height:%s,  paddingbottom:%s, panelHeight:%s, slidePixelOffset:%s", slidingViewHeight, getMeasuredHeight(), getPaddingBottom(), mPanelHeight, slidePixelOffset));
         return mIsSlidingUp
                 ? getMeasuredHeight() - getPaddingBottom() - mPanelHeight - slidePixelOffset
                 : getPaddingTop() - slidingViewHeight + mPanelHeight + slidePixelOffset;
@@ -1248,7 +1256,38 @@ public class SlidingUpPanelLayout extends ViewGroup {
             ViewCompat.setTranslationY(mMainView, mainViewOffset);
         }
     }
-
+    
+    
+    @Override
+    protected void onConfigurationChanged(Configuration newConfig) {
+        isRestore = true;
+        super.onConfigurationChanged(newConfig);
+        Log.d("config", "onConfigurationChanged");
+        Log.d("config", "mParallaxView 的 top 为:" + mParallaxView.getTop());
+        
+        
+        Log.d("parallax", "onConfigurationChanged top:" + mParallaxView.getTop());
+    
+    
+//        float y = computeParallaxViewY();
+//        Log.d("onLayout", "isRestore  onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
+//        ViewCompat.setTranslationY(mParallaxView, y);
+        
+        float y = computeParallaxViewY();
+        Log.d("parallax", "onConfigurationChanged  在 y 轴方向上需要移动的距离为:" + y);
+    
+        postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                requestLayout();
+            }
+        }, 500);
+//
+//        float yTranslation = ViewCompat.getTranslationY(mParallaxView);
+//        Log.d("config", "onConfigurationChanged  yTranslation of parallax view:" + yTranslation);
+        
+    }
+    
     private void onPanelDragged(int newTop) {
     
         Log.d("height", "onPanelDragged >>> new Top:" + newTop);
@@ -1266,7 +1305,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             // height of the main content
             LayoutParams lp = (LayoutParams) mMainView.getLayoutParams();
             int defaultHeight = getHeight() - getPaddingBottom() - getPaddingTop() - mPanelHeight;
-        
+
             if (mSlideOffset <= 0 && !mOverlayContent) {
                 // expand the main view
                 lp.height = mIsSlidingUp ? (newTop - getPaddingBottom()) : (getHeight() - getPaddingBottom() - mSlideableView.getMeasuredHeight() - newTop);
@@ -1284,19 +1323,40 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (mSlideOffset < mAnchorPoint) {
                 Log.d("height", "getHeight >>>" + getHeight());
                 Log.d("height", "getPanelHeight >>>" + getPanelHeight());
-                Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
+//                Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
                 Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
-//                ViewCompat.setTranslationY(mParallaxView, computeParallaxViewY());
+                float y = computeParallaxViewY();
+                Log.d("onLayout", "onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
+                ViewCompat.setTranslationY(mParallaxView, y);
 //                mParallaxView.requestLayout();
             }
         }
+    
+        Log.d("parallax", "onPanelDragged before requestLayout");
+//        logPanel("onPanelDragged");
+//        requestLayout();
+//        invalidate();
+    }
+    
+    private void logPanel(String info){
+        float expand   = computePanelTopPosition(1);
+    
+        float collapse = computePanelTopPosition(0);
+    
+        Log.d("panelTopPos", String.format("调用时机: %s;  expand:%s; collapse:%s", info, expand, collapse));
     }
     
     private float computeParallaxViewY(){
-        float offset = mSlideOffset / mAnchorPoint;
+        //idea 如果滚动的 slideOffset 大于"锚点对应的 offset",那么应该使用"锚点对应的 offset"
+        float currentOffset = mSlideOffset >= mAnchorPoint ? mAnchorPoint : mSlideOffset;
+        float offset = currentOffset / mAnchorPoint;
         offset = mIsSlidingUp ? -offset : offset;
-        return offset * mParallaxView.getMeasuredHeight();
     
+        float slideRange = Math.abs(computePanelTopPosition(1) - computePanelTopPosition(0));
+//        float slideRange = mParallaxView.getMeasuredHeight();
+        logPanel("compute parallax view y");
+        
+        return offset * slideRange;
     }
 
     @Override
@@ -1467,14 +1527,20 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     @Override
     public Parcelable onSaveInstanceState() {
+        Log.d("instaceState", "onSaveInstanceState");
         Bundle bundle = new Bundle();
         bundle.putParcelable("superState", super.onSaveInstanceState());
         bundle.putSerializable(SLIDING_STATE, mSlideState != PanelState.DRAGGING ? mSlideState : mLastNotDraggingSlideState);
         return bundle;
     }
-
+    
+    
+    boolean isRestore = false;
+    
     @Override
     public void onRestoreInstanceState(Parcelable state) {
+        isRestore = true;
+        Log.d("instaceState", "onRestoreInstanceState");
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
             mSlideState = (PanelState) bundle.getSerializable(SLIDING_STATE);
@@ -1482,6 +1548,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             state = bundle.getParcelable("superState");
         }
         super.onRestoreInstanceState(state);
+        logPanel("onRestoreInstanceState");
     }
 
     private class DragHelperCallback extends ViewDragHelper.Callback {
@@ -1494,6 +1561,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         @Override
         public void onViewDragStateChanged(int state) {
+            Log.d("parallax", "onViewDragStateChanged");
             if (mDragHelper != null && mDragHelper.getViewDragState() == ViewDragHelper.STATE_IDLE) {
                 mSlideOffset = computeSlideOffset(mSlideableView.getTop());
                 applyParallaxForCurrentSlideOffset();
@@ -1563,7 +1631,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (mDragHelper != null) {
                 mDragHelper.settleCapturedViewAt(releasedChild.getLeft(), target);
             }
+    
+            Log.d("parallax", "onViewReleased");
             invalidate();
+            logPanel("onViewReleased");
         }
 
         @Override
