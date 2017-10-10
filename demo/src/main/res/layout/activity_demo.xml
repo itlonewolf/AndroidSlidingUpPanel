@@ -6,10 +6,10 @@
         android:layout_height="match_parent"
         android:gravity="bottom"
         sothree:umanoPanelHeight="68dp"
-        sothree:umanoShadowHeight="4dp"
+        sothree:umanoShadowHeight="0dp"
         sothree:umanoParallaxOffset="0dp"
         sothree:umanoDragView="@+id/slideableView"
-        sothree:umanoOverlay="false"
+        sothree:umanoOverlay="true"
         sothree:umanoScrollableView="@+id/sv"
 
 

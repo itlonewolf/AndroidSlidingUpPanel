@@ -969,7 +969,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             updateObscuredViewVisibility();
         }
         applyParallaxForCurrentSlideOffset();
-
+        applyParallax();
         mFirstLayout = false;
     }
 
@@ -1302,8 +1302,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         
         
         Log.d("parallax", "onConfigurationChanged top:" + mParallaxView.getTop());
-    
-        applyParallax();
 //        float y = computeParallaxViewY();
 //        Log.d("onLayout", "isRestore  onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
 //        ViewCompat.setTranslationY(mParallaxView, y);
