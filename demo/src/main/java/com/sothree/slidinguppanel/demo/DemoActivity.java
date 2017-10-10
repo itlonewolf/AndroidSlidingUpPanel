@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
+import com.sothree.slidinguppanel.Loggor;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
@@ -28,6 +29,7 @@ public class DemoActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
+        Loggor.voidMethod();
     
         int height = this.getWindowManager().getDefaultDisplay().getHeight();
         Log.d("height", "Window height >>>>>>>>>>>>>>>>>>>>>>>>" + height);

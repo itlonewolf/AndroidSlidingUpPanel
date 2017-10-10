@@ -20,6 +20,7 @@ import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
+import com.orhanobut.logger.Logger;
 import com.sothree.slidinguppanel.library.R;
 
 import java.util.List;
@@ -845,6 +846,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
             } else if (child == mParallaxView) {
                 height = Math.abs(computePanelTopPosition(1) - computePanelTopPosition(mAnchorPoint));
                 Log.d("height", "mParallaxView >>> height " + height);
+                if (height < 600) {
+                    height = 336;
+                }
             }
 
             int childWidthSpec;
@@ -934,6 +938,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
             if (child == mParallaxView) {
                 childTop = computePanelTopPosition(mSlideOffset);
+                if (childTop != 1552) {
+                    childTop = 838;
+                }
+                Log.d("parallaY", String.format("parallax 的 top 将被设置为: %s", childTop));
+                
                 Log.d("parallax", " on layout top:" + childTop);
                 Log.d("onLayout", "在 onLayout 方法中 mParallaxView 的 top >>>" + childTop);
             }
@@ -1170,9 +1179,21 @@ public class SlidingUpPanelLayout extends ViewGroup {
         
         // Compute the top of the panel if its collapsed
     
-        Log.d("panelTopPosC", String.format("slidingViewHeight:%s,  measured height:%s,  paddingbottom:%s, panelHeight:%s, slidePixelOffset:%s", slidingViewHeight, getMeasuredHeight(), getPaddingBottom(), mPanelHeight, slidePixelOffset));
+//        Logger.d("slidingViewHeight:%s,  measured height:%s, panelHeight:%s, slidePixelOffset:%s",  slidingViewHeight, getMeasuredHeight(), mPanelHeight, slidePixelOffset);
+//        Loggor.log("SUPYEE", "slidingViewHeight:%s,  measured height:%s, panelHeight:%s, slidePixelOffset:%s", slidingViewHeight, getMeasuredHeight(), mPanelHeight, slidePixelOffset);
+//        Log.d("panelTopPosC", String.format("slidingViewHeight:%s,  measured height:%s,  paddingbottom:%s, panelHeight:%s, slidePixelOffset:%s", slidingViewHeight, getMeasuredHeight(), getPaddingBottom(), mPanelHeight, slidePixelOffset));
+    
+        int measuredHeight = getMeasuredHeight();
+        if (slidingViewHeight != 1731) {
+            slidingViewHeight = 1017;
+            measuredHeight = 1017;
+//            slidePixelOffset = 1552;
+        }
+    
+        Logger.d("slidingViewHeight:%s,  measured height:%s, panelHeight:%s, slidePixelOffset:%s",  slidingViewHeight, measuredHeight, mPanelHeight, slidePixelOffset);
+        
         return mIsSlidingUp
-                ? getMeasuredHeight() - getPaddingBottom() - mPanelHeight - slidePixelOffset
+                ? measuredHeight - getPaddingBottom() - mPanelHeight - slidePixelOffset
                 : getPaddingTop() - slidingViewHeight + mPanelHeight + slidePixelOffset;
     }
 
@@ -1268,21 +1289,23 @@ public class SlidingUpPanelLayout extends ViewGroup {
         
         Log.d("parallax", "onConfigurationChanged top:" + mParallaxView.getTop());
     
-    
+        applyParallax();
 //        float y = computeParallaxViewY();
 //        Log.d("onLayout", "isRestore  onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
 //        ViewCompat.setTranslationY(mParallaxView, y);
         
-        float y = computeParallaxViewY();
-        Log.d("parallax", "onConfigurationChanged  在 y 轴方向上需要移动的距离为:" + y);
-    
-        postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                requestLayout();
-            }
-        }, 500);
+//        float y = computeParallaxViewY();
+//        Log.d("parallax", "onConfigurationChanged  在 y 轴方向上需要移动的距离为:" + y);
 //
+//        onPanelDragged(mSlideableView.getTop());
+//        invalidate();
+//        postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                requestLayout();
+//            }
+//        }, 200);
+//        Logger.t("demo").d("刷新了!!!");
 //        float yTranslation = ViewCompat.getTranslationY(mParallaxView);
 //        Log.d("config", "onConfigurationChanged  yTranslation of parallax view:" + yTranslation);
         
@@ -1319,23 +1342,47 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
         }
     
+//        if (mParallaxView != null) {
+//            if (mSlideOffset < mAnchorPoint) {
+//                Log.d("height", "getHeight >>>" + getHeight());
+//                Log.d("height", "getPanelHeight >>>" + getPanelHeight());
+////                Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
+//                Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
+//                float y = computeParallaxViewY();
+//                Log.d("onLayout", "onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
+////                Log.d("parallaxY", "本次计算的 computeParallaxViewY 值为:" + y);
+//                Log.d("parallaxY", String.format("computeParallaxViewY 值为: %s,  mParallaxView 的 top: %s", y, mParallaxView.getTop()));
+//                ViewCompat.setTranslationY(mParallaxView, y);
+//
+////                mParallaxView.requestLayout();
+//            }
+//        }
+        
+        applyParallax();
+    
+        Log.d("parallax", "onPanelDragged before requestLayout");
+//        logPanel("onPanelDragged");
+//        requestLayout();
+//        invalidate();
+    }
+    
+    
+    private void applyParallax(){
         if (mParallaxView != null) {
-            if (mSlideOffset < mAnchorPoint) {
+//            if (mSlideOffset <= mAnchorPoint) {
                 Log.d("height", "getHeight >>>" + getHeight());
                 Log.d("height", "getPanelHeight >>>" + getPanelHeight());
 //                Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
                 Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
                 float y = computeParallaxViewY();
                 Log.d("onLayout", "onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
+//                Log.d("parallaxY", "本次计算的 computeParallaxViewY 值为:" + y);
+                Log.d("parallaxY", String.format("computeParallaxViewY 值为: %s,  mParallaxView 的 top: %s", y, mParallaxView.getTop()));
                 ViewCompat.setTranslationY(mParallaxView, y);
+
 //                mParallaxView.requestLayout();
-            }
+//            }
         }
-    
-        Log.d("parallax", "onPanelDragged before requestLayout");
-//        logPanel("onPanelDragged");
-//        requestLayout();
-//        invalidate();
     }
     
     private void logPanel(String info){
@@ -1353,6 +1400,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
         offset = mIsSlidingUp ? -offset : offset;
     
         float slideRange = Math.abs(computePanelTopPosition(1) - computePanelTopPosition(0));
+    
+        if (isRestore) {
+            slideRange = 838;
+        }
+        Log.d("parallaxY", String.format("slideRange >> %s", slideRange));
 //        float slideRange = mParallaxView.getMeasuredHeight();
         logPanel("compute parallax view y");
         
