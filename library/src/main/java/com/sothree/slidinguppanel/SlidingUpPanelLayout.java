@@ -9,18 +9,24 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
+import android.support.annotation.IdRes;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.*;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import com.orhanobut.logger.Logger;
 import com.sothree.slidinguppanel.library.R;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class SlidingUpPanelLayout extends ViewGroup {
@@ -147,6 +153,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     private View mScrollableView;
     private int mScrollableViewResId;
+    
+    private Set<Integer> mScrollableIds ;
     private ScrollableViewHelper mScrollableViewHelper = new ScrollableViewHelper();
 
     /**
@@ -371,12 +379,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
         if (mSlideableViewResId != -1) {
             mSlideableView = findViewById(mSlideableViewResId);
-            mSlideableView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                @Override
-                public void onGlobalLayout() {
-                    Log.d("layoutglobal", String.format("mSlideableView measure height:%s", mSlideableView.getMeasuredHeight()));
-                }
-            });
+//            mSlideableView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//                @Override
+//                public void onGlobalLayout() {
+//                    Log.d("layoutglobal", String.format("mSlideableView measure height:%s", mSlideableView.getMeasuredHeight()));
+//                }
+//            });
         }
     
         if (mParallaxViewResId != -1) {
@@ -612,6 +620,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     public void setScrollableView(View scrollableView) {
         mScrollableView = scrollableView;
+    }
+    
+    public void addScrollableViewId(@IdRes int...scrollableViewId){
+        if (mScrollableIds == null) {
+            mScrollableIds = new HashSet<>();
+        }
+        for (int resId : scrollableViewId) {
+            if (!mScrollableIds.contains(resId)) {
+                mScrollableIds.add(resId);
+            }
+        }
     }
 
     /**
@@ -1078,6 +1097,38 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return false;
         }
     }
+    
+    private boolean isScrollableViewsUnder(Set<Integer> ids, int x, int y) {
+        if (ids == null) {
+            return false;
+        }
+        View touchingView = ViewHelper.findTopChildUnder(mSlideableView, x, y);
+        
+        if (touchingView == null) {
+            Log.d("scrollableYee", "touchingView == null");
+            return false;
+        }
+        Log.d("scrollableYee", String.format("正在触摸的 view:%s", touchingView.getClass().getSimpleName()));
+    
+        int touchViewId = touchingView.getId();
+        if (touchViewId == View.NO_ID) {
+            Log.d("scrollableYee", "touchViewId == View.NO_ID");
+            return false;
+        }
+    
+        Log.d("scrollableYee", String.format("ids.contains(touchViewId): %s", ids.contains(touchViewId)));
+        return ids.contains(touchViewId);
+    }
+    
+    private int getTouchingScrollableViewScrollPos(int x, int y){
+        View touchingView = ViewHelper.findTopChildUnder(mSlideableView, x, y);
+        if (touchingView != null) {
+            Log.d("scrollableYee", String.format("正在触摸的 view:%s", touchingView.getClass().getSimpleName()));
+        }
+        final int scrollPos = mScrollableViewHelper.getScrollableViewScrollPosition(touchingView, mIsSlidingUp);
+        Log.d("scrollableYee", String.format("scrollPos :%s", scrollPos));
+        return scrollPos;
+    }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -1111,6 +1162,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
             Log.d("dispatch", "dispatchTouchEvent >>> ACTION_MOVE");
             // If the scroll view isn't under the touch, pass the
             // event along to the dragView.
+            //yee
+//            if (!isScrollableViewsUnder(mScrollableIds, (int) mInitialMotionX, (int) mInitialMotionY)) {
             if (!isViewUnder(mScrollableView, (int) mInitialMotionX, (int) mInitialMotionY)) {
                 return super.dispatchTouchEvent(ev);
             }
@@ -1120,6 +1173,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 // Is the child less than fully scrolled?
                 // Then let the child handle it.
                 //idea 比如手指往下滑动时,如果 listview 的第一条未到达顶部,那么先交给 listview 让其自己先滑动到顶部
+                //yee
+//                if (getTouchingScrollableViewScrollPos((int) mInitialMotionX, (int) mInitialMotionY) > 0) {
                 if (mScrollableViewHelper.getScrollableViewScrollPosition(mScrollableView, mIsSlidingUp) > 0) {
                     mIsScrollableViewHandlingTouch = true;
                     return super.dispatchTouchEvent(ev);
