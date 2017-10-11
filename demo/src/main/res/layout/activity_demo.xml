@@ -17,9 +17,10 @@
     <!-- MAIN CONTENT -->
     <FrameLayout
             android:id="@+id/mainView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:background="#ffdd00"
     >
         <android.support.v7.widget.Toolbar
             xmlns:sothree="http://schemas.android.com/apk/res-auto"
