@@ -2,9 +2,11 @@ package com.sothree.slidinguppanel;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -611,16 +613,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         mDragViewResId = dragViewResId;
         setDragView(findViewById(dragViewResId));
     }
-
-//    /**
-//     * Set the scrollable child of the sliding layout. If set, scrolling will be transfered between
-//     * the panel and the view when necessary
-//     *
-//     * @param scrollableView The scrollable view
-//     */
-//    public void setScrollableView(View scrollableView) {
-//        mScrollableView = scrollableView;
-//    }
     
     public void addScrollableViewId(@IdRes int...scrollableViewId){
         if (mScrollableIds == null) {
@@ -880,10 +872,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 height = parallaxHeight();
                 isMeasureMehod = false;
                 Log.d("height", "mParallaxView >>> height " + height);
-                if (height < 600) {
-                    //demo
-//                    height = 336;
-                }
             }
 
             int childWidthSpec;
@@ -980,10 +968,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
             if (child == mParallaxView) {
                 childTop = computePanelTopPosition(0);
-                if (childTop != 1552) {
-                    //demo
-//                    childTop = 838;
-                }
                 Log.d("parallaY", String.format("parallax 的 top 将被设置为: %s", childTop));
                 
                 Log.d("parallax", " on layout top:" + childTop);
@@ -1100,7 +1084,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
     private boolean isScrollableViewsUnder(Set<Integer> ids, int x, int y) {
         if (ids == null) {
-            return false;
+            return ViewHelper.isViewUnder(mSlideableView, x, y);
         }
         View touchingView = ViewHelper.findScrollableViewUnder(mSlideableView, x, y);
         
@@ -1356,38 +1340,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
     
-    
-    @Override
-    protected void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        requestLayout();
-        invalidate();
-        Log.d("config", "onConfigurationChanged");
-        Log.d("config", "mParallaxView 的 top 为:" + mParallaxView.getTop());
-        
-        
-        Log.d("parallax", "onConfigurationChanged top:" + mParallaxView.getTop());
-//        float y = computeParallaxViewY();
-//        Log.d("onLayout", "isRestore  onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
-//        ViewCompat.setTranslationY(mParallaxView, y);
-        
-//        float y = computeParallaxViewY();
-//        Log.d("parallax", "onConfigurationChanged  在 y 轴方向上需要移动的距离为:" + y);
-//
-//        onPanelDragged(mSlideableView.getTop());
-//        invalidate();
-//        postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                requestLayout();
-//            }
-//        }, 200);
-//        Logger.t("demo").d("刷新了!!!");
-//        float yTranslation = ViewCompat.getTranslationY(mParallaxView);
-//        Log.d("config", "onConfigurationChanged  yTranslation of parallax view:" + yTranslation);
-        
-    }
-    
     private void onPanelDragged(int newTop) {
     
         Log.d("height", "onPanelDragged >>> new Top:" + newTop);
@@ -1569,12 +1521,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
     
-    
-    static Paint mPaint = new Paint();
-    static {
-        mPaint.setColor(Color.RED);
-        mPaint.setTextSize(30);
-    }
+//
+//    static Paint mPaint = new Paint();
+//    static {
+//        mPaint.setColor(Color.RED);
+//        mPaint.setTextSize(30);
+//    }
     
     @Override
     public void draw(Canvas c) {

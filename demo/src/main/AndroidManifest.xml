@@ -22,7 +22,7 @@
         <activity
                 android:name=".DemoActivity"
                 android:label="@string/app_name"
-                android:configChanges="orientation|layoutDirection|screenSize"
+
         >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -33,4 +33,6 @@
     </application>
 
 </manifest>
-<!--android:configChanges="orientation|layoutDirection|screenSize"-->
+<!--
+    android:configChanges="orientation|layoutDirection|screenSize"
+-->

@@ -41,4 +41,12 @@ public class ViewHelper {
         }
         return null;
     }
+    
+    public static boolean isViewUnder(View view, int x, int y) {
+        if (x >= view.getLeft() && x < view.getRight() &&
+                y >= view.getTop() && y < view.getBottom()) {
+            return true;
+        }
+        return false;
+    }
 }
