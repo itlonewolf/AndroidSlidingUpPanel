@@ -13,13 +13,11 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
+import com.orhanobut.logger.Logger;
 import com.sothree.slidinguppanel.library.R;
 
 import java.util.List;
@@ -233,7 +231,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private boolean mFirstLayout = true;
     
     /**
-     * 裁切遮盖部分时使用的 rect 对象
+     * 裁切遮盖部分时使用的 windowRect 对象
      */
     private final Rect mTmpRect = new Rect();
 
@@ -288,6 +286,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return;
         }
 
+        
         Interpolator scrollerInterpolator = null;
         if (attrs != null) {
             TypedArray defAttrs = context.obtainStyledAttributes(attrs, DEFAULT_ATTRS);
@@ -372,6 +371,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
         if (mSlideableViewResId != -1) {
             mSlideableView = findViewById(mSlideableViewResId);
+            mSlideableView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @Override
+                public void onGlobalLayout() {
+                    Log.d("layoutglobal", String.format("mSlideableView measure height:%s", mSlideableView.getMeasuredHeight()));
+                }
+            });
         }
     
         if (mParallaxViewResId != -1) {
@@ -779,13 +784,19 @@ public class SlidingUpPanelLayout extends ViewGroup {
         super.onDetachedFromWindow();
         mFirstLayout = true;
     }
-
+    
+    
+    boolean isMeasureMehod = false;
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         final int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+    
+        Logger.t("SUPYEEs").d("onMeasureonMeasure >>>heightSize : %s", heightSize);
+    
+        Log.d("onMeasureYee", String.format("heightSize : %s", heightSize));
 
         if (widthMode != MeasureSpec.EXACTLY && widthMode != MeasureSpec.AT_MOST) {
             throw new IllegalStateException("Width must have an exact value or MATCH_PARENT");
@@ -814,7 +825,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
         //idea 去掉上下左右的 padding
         int layoutHeight = heightSize - getPaddingTop() - getPaddingBottom();
         int layoutWidth = widthSize - getPaddingLeft() - getPaddingRight();
-
+    
+        Logger.d("layoutHeight : %s", layoutHeight);
+//        Log.d("onMeasureYee", String.format("layoutHeight : %s", layoutHeight));
         // First pass. Measure based on child LayoutParams width/height.
         for (int i = 0; i < childCount; i++) {
             final View child = getChildAt(i);
@@ -843,8 +856,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 height -= lp.topMargin;
                 Log.d("height", "---------mSlideableView >>> height " + height);
             } else if (child == mParallaxView) {
-                height = Math.abs(computePanelTopPosition(1) - computePanelTopPosition(mAnchorPoint));
-                
+                isMeasureMehod = true;
+//                height = Math.abs(computePanelTopPosition(1) - computePanelTopPosition(mAnchorPoint));
+                height = parallaxHeight();
+                isMeasureMehod = false;
                 Log.d("height", "mParallaxView >>> height " + height);
                 if (height < 600) {
                     //demo
@@ -888,7 +903,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         setMeasuredDimension(widthSize, heightSize);
     }
-
+    
+    final Rect windowRect = new Rect();
+    private int parallaxHeight(){
+        getWindowVisibleDisplayFrame(windowRect);
+        return Math.abs((int) ((windowRect.height() - mPanelHeight) * (1 - mAnchorPoint)));
+    }
+    
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         final int paddingLeft = getPaddingLeft();
@@ -1186,7 +1207,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 //        Loggor.log("SUPYEE", "slidingViewHeight:%s,  measured height:%s, panelHeight:%s, slidePixelOffset:%s", slidingViewHeight, getMeasuredHeight(), mPanelHeight, slidePixelOffset);
 //        Log.d("panelTopPosC", String.format("slidingViewHeight:%s,  measured height:%s,  paddingbottom:%s, panelHeight:%s, slidePixelOffset:%s", slidingViewHeight, getMeasuredHeight(), getPaddingBottom(), mPanelHeight, slidePixelOffset));
     
-        int measuredHeight = getMeasuredHeight();
+        int vgMeasuredHeight = getMeasuredHeight();
 //        if (slidingViewHeight != 1731) {
 //            slidingViewHeight = 1017;
 //            measuredHeight = 1017;
@@ -1194,18 +1215,25 @@ public class SlidingUpPanelLayout extends ViewGroup {
 //        }
     
         Log.d("computeYee", "--------------------");
-        Log.d("computeYee", String.format("\tslidingViewHeight:%s,    VG measured height:%s", slidingViewHeight,  measuredHeight));
+        Log.d("computeYee", String.format("\tslidingViewHeight:%s,    VG measured height:%s", slidingViewHeight,  vgMeasuredHeight));
         Log.d("computeYee", String.format("\tpanelHeight:%s,          slidePixelOffset:%s",   mPanelHeight,       slidePixelOffset));
         Log.d("computeYee", String.format("\tslideOffset:%s,          mSlideRange:%s",        slideOffset,        mSlideRange));
-        Loggor.log("\tslidingViewHeight:%s,    VG measured height:%s,\r\n\tpanelHeight:%s,          slidePixelOffset:%s, \r\n\tslideOffset:%s,          mSlideRange:%s",slidingViewHeight,  measuredHeight, mPanelHeight,
-                   slidePixelOffset, slideOffset,        mSlideRange);
+    
+        int retult = vgMeasuredHeight - getPaddingBottom() - mPanelHeight - slidePixelOffset;
+        if (isMeasureMehod) {
+            Loggor.log("\tslidingViewHeight:%s,    VG measured height:%s,\r\n\tpanelHeight:%s,          slidePixelOffset:%s, \r\n\tslideOffset:%s,          mSlideRange:%s, \r\n\t result:%s",
+                       slidingViewHeight,  vgMeasuredHeight,
+                       mPanelHeight, slidePixelOffset,
+                       slideOffset,        mSlideRange,
+                       retult);
+        }
 //        Loggor.log("\tslidingViewHeight:%s,    VG measured height:%s", slidingViewHeight,  measuredHeight);
 //        Loggor.log("\tpanelHeight:%s,          slidePixelOffset:%s",   mPanelHeight,       slidePixelOffset);
 //        Loggor.log("\tslideOffset:%s,          mSlideRange:%s",        slideOffset,        mSlideRange);
 //        Logger.d("slidingViewHeight:%s,  measured height:%s, panelHeight:%s, slidePixelOffset:%s",  slidingViewHeight, measuredHeight, mPanelHeight, slidePixelOffset);
         
         return mIsSlidingUp
-                ? measuredHeight - getPaddingBottom() - mPanelHeight - slidePixelOffset
+                ? retult
                 : getPaddingTop() - slidingViewHeight + mPanelHeight + slidePixelOffset;
     }
 
@@ -1293,7 +1321,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
     @Override
     protected void onConfigurationChanged(Configuration newConfig) {
-        isRestore = true;
         super.onConfigurationChanged(newConfig);
         requestLayout();
         invalidate();
@@ -1412,11 +1439,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         offset = mIsSlidingUp ? -offset : offset;
     
         float slideRange = Math.abs(computePanelTopPosition(1) - computePanelTopPosition(0));
-    
-        if (isRestore) {
-            //demo
-//            slideRange = 838;
-        }
     
         mSlideRange = (int) slideRange;
         Log.d("parallaxY", String.format("slideRange >> %s", slideRange));
@@ -1602,11 +1624,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
     
     
-    boolean isRestore = false;
-    
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        isRestore = true;
         Log.d("instaceState", "onRestoreInstanceState");
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
