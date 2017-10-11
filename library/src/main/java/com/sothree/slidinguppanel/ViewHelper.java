@@ -1,7 +1,10 @@
 package com.sothree.slidinguppanel;
 
+import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.ScrollView;
 
 /**
  * Created by xiaoyee on 11/10/2017.
@@ -9,14 +12,17 @@ import android.view.ViewGroup;
 
 public class ViewHelper {
     /**
-     * Find the topmost child under the given point within the parent view's coordinate system.
-     * The child order is determined using {@link ViewDragHelper.Callback#getOrderedChildIndex(int)}.
-     *
-     * @param x X position to test in the parent's coordinate system
-     * @param y Y position to test in the parent's coordinate system
-     * @return The topmost child view under (x, y) or null if none found.
+     * 查找最上层
+     * @param rootView 父 view
+     * @param x        触摸点 x
+     * @param y        触摸点 y
+     * @return 如果父 view 是可滚动的,那么直接返回;如果父 view 不是 ViewGroup 的子类,那么直接返回;如果是 ViewGroup 的子类,那么获取到 index 为 0 的子 view
      */
-    public static View findTopChildUnder(View rootView, int x, int y) {
+    public static View findScrollableViewUnder(View rootView, int x, int y) {
+        if (rootView instanceof ScrollView || rootView instanceof ListView || rootView instanceof RecyclerView) {
+            return rootView;
+        }
+        
         if (rootView instanceof ViewGroup) {
             ViewGroup parentView = (ViewGroup) rootView;
             final int childCount = parentView.getChildCount();

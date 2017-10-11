@@ -148,11 +148,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     private int mDragViewResId = -1;
 
-    /**
-     * If provided, the panel will transfer the scroll from this view to itself when needed.
-     */
-    private View mScrollableView;
-    private int mScrollableViewResId;
+//    /**
+//     * If provided, the panel will transfer the scroll from this view to itself when needed.
+//     */
+//    private View mScrollableView;
+//    private int mScrollableViewResId;
     
     private Set<Integer> mScrollableIds ;
     private ScrollableViewHelper mScrollableViewHelper = new ScrollableViewHelper();
@@ -317,7 +317,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mCoveredFadeColor = ta.getColor(R.styleable.SlidingUpPanelLayout_umanoFadeColor, DEFAULT_FADE_COLOR);
 
                 mDragViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoDragView, -1);
-                mScrollableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoScrollableView, -1);
+//                mScrollableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoScrollableView, -1);
     
                 mMainViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoMainView, -1);
                 mSlideableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoSlideableView, -1);
@@ -394,9 +394,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (mDragViewResId != -1) {
             setDragView(findViewById(mDragViewResId));
         }
-        if (mScrollableViewResId != -1) {
-            setScrollableView(findViewById(mScrollableViewResId));
-        }
+//        if (mScrollableViewResId != -1) {
+//            setScrollableView(findViewById(mScrollableViewResId));
+//        }
     
         if (mSlideableView == null) {
             throw new IllegalStateException("必须指定 slideable view");
@@ -612,15 +612,15 @@ public class SlidingUpPanelLayout extends ViewGroup {
         setDragView(findViewById(dragViewResId));
     }
 
-    /**
-     * Set the scrollable child of the sliding layout. If set, scrolling will be transfered between
-     * the panel and the view when necessary
-     *
-     * @param scrollableView The scrollable view
-     */
-    public void setScrollableView(View scrollableView) {
-        mScrollableView = scrollableView;
-    }
+//    /**
+//     * Set the scrollable child of the sliding layout. If set, scrolling will be transfered between
+//     * the panel and the view when necessary
+//     *
+//     * @param scrollableView The scrollable view
+//     */
+//    public void setScrollableView(View scrollableView) {
+//        mScrollableView = scrollableView;
+//    }
     
     public void addScrollableViewId(@IdRes int...scrollableViewId){
         if (mScrollableIds == null) {
@@ -1102,7 +1102,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (ids == null) {
             return false;
         }
-        View touchingView = ViewHelper.findTopChildUnder(mSlideableView, x, y);
+        View touchingView = ViewHelper.findScrollableViewUnder(mSlideableView, x, y);
         
         if (touchingView == null) {
             Log.d("scrollableYee", "touchingView == null");
@@ -1121,7 +1121,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
     
     private int getTouchingScrollableViewScrollPos(int x, int y){
-        View touchingView = ViewHelper.findTopChildUnder(mSlideableView, x, y);
+        View touchingView = ViewHelper.findScrollableViewUnder(mSlideableView, x, y);
         if (touchingView != null) {
             Log.d("scrollableYee", String.format("正在触摸的 view:%s", touchingView.getClass().getSimpleName()));
         }
@@ -1163,8 +1163,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
             // If the scroll view isn't under the touch, pass the
             // event along to the dragView.
             //yee
-//            if (!isScrollableViewsUnder(mScrollableIds, (int) mInitialMotionX, (int) mInitialMotionY)) {
-            if (!isViewUnder(mScrollableView, (int) mInitialMotionX, (int) mInitialMotionY)) {
+            if (!isScrollableViewsUnder(mScrollableIds, (int) mInitialMotionX, (int) mInitialMotionY)) {
+//            if (!isViewUnder(mScrollableView, (int) mInitialMotionX, (int) mInitialMotionY)) {
                 return super.dispatchTouchEvent(ev);
             }
 
@@ -1174,8 +1174,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 // Then let the child handle it.
                 //idea 比如手指往下滑动时,如果 listview 的第一条未到达顶部,那么先交给 listview 让其自己先滑动到顶部
                 //yee
-//                if (getTouchingScrollableViewScrollPos((int) mInitialMotionX, (int) mInitialMotionY) > 0) {
-                if (mScrollableViewHelper.getScrollableViewScrollPosition(mScrollableView, mIsSlidingUp) > 0) {
+                if (getTouchingScrollableViewScrollPos((int) mInitialMotionX, (int) mInitialMotionY) > 0) {
+//                if (mScrollableViewHelper.getScrollableViewScrollPosition(mScrollableView, mIsSlidingUp) > 0) {
                     mIsScrollableViewHandlingTouch = true;
                     return super.dispatchTouchEvent(ev);
                 }
