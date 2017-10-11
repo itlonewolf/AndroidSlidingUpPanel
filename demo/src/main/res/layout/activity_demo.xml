@@ -42,20 +42,28 @@
             android:textSize="16sp" />
     </FrameLayout>
 
-    <LinearLayout
+    <ImageView
             android:id="@+id/parallaxView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-    >
+            android:src="@drawable/demo"
+            android:scaleType="centerCrop"
+    />
 
-        <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:src="@drawable/demo"
-                android:scaleType="centerCrop"
-        />
-    </LinearLayout>
+    <!--<LinearLayout-->
+            <!--android:id="@+id/parallaxView"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:orientation="horizontal"-->
+    <!--&gt;-->
+
+        <!--<ImageView-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:src="@drawable/demo"-->
+                <!--android:scaleType="centerCrop"-->
+        <!--/>-->
+    <!--</LinearLayout>-->
 
     <!-- SLIDING LAYOUT -->
     <LinearLayout

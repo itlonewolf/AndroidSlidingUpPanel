@@ -1255,19 +1255,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         int slidePixelOffset = (int) (slideOffset * mSlideRange);
     
         Log.d("parallax", String.format("slidingViewHeight : %s; slide range: %s", slidingViewHeight, mSlideRange));
-        
-        // Compute the top of the panel if its collapsed
-    
-//        Logger.d("slidingViewHeight:%s,  measured height:%s, panelHeight:%s, slidePixelOffset:%s",  slidingViewHeight, getMeasuredHeight(), mPanelHeight, slidePixelOffset);
-//        Loggor.log("SUPYEE", "slidingViewHeight:%s,  measured height:%s, panelHeight:%s, slidePixelOffset:%s", slidingViewHeight, getMeasuredHeight(), mPanelHeight, slidePixelOffset);
-//        Log.d("panelTopPosC", String.format("slidingViewHeight:%s,  measured height:%s,  paddingbottom:%s, panelHeight:%s, slidePixelOffset:%s", slidingViewHeight, getMeasuredHeight(), getPaddingBottom(), mPanelHeight, slidePixelOffset));
-    
         int vgMeasuredHeight = getMeasuredHeight();
-//        if (slidingViewHeight != 1731) {
-//            slidingViewHeight = 1017;
-//            measuredHeight = 1017;
-////            slidePixelOffset = 1552;
-//        }
     
         Log.d("computeYee", "--------------------");
         Log.d("computeYee", String.format("\tslidingViewHeight:%s,    VG measured height:%s", slidingViewHeight,  vgMeasuredHeight));
@@ -1282,11 +1270,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
                        slideOffset,        mSlideRange,
                        retult);
         }
-//        Loggor.log("\tslidingViewHeight:%s,    VG measured height:%s", slidingViewHeight,  measuredHeight);
-//        Loggor.log("\tpanelHeight:%s,          slidePixelOffset:%s",   mPanelHeight,       slidePixelOffset);
-//        Loggor.log("\tslideOffset:%s,          mSlideRange:%s",        slideOffset,        mSlideRange);
-//        Logger.d("slidingViewHeight:%s,  measured height:%s, panelHeight:%s, slidePixelOffset:%s",  slidingViewHeight, measuredHeight, mPanelHeight, slidePixelOffset);
-        
         return mIsSlidingUp
                 ? retult
                 : getPaddingTop() - slidingViewHeight + mPanelHeight + slidePixelOffset;
