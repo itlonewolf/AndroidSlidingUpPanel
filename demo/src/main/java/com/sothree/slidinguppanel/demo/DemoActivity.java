@@ -4,16 +4,22 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.widget.*;
 import com.sothree.slidinguppanel.Loggor;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class DemoActivity extends ActionBarActivity {
     private static final String TAG = "DemoActivity";
@@ -33,14 +39,15 @@ public class DemoActivity extends ActionBarActivity {
 
         setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
     
-        initLv();
+        
     
 //        mImageView = (ImageView) findViewById(R.id.ivDemo);
         
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-//        mLayout.addScrollableViewId(R.id.list, R.id.sv);
-//        mLayout.addScrollableViewId(R.id.slideableView);
-    
+        
+        //idea 将含有多个可滚动 view 时的代码统一放到此方法中,方便注释掉。。。
+        wrapMultiScrollableView();
+        
         mLayout.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
@@ -49,7 +56,6 @@ public class DemoActivity extends ActionBarActivity {
         });
         
 //        mLayout.setMainViewParallaxOffset(500);
-        mLayout.setCoveredFadeColor(0);
         mLayout.addPanelSlideListener(new PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -70,61 +76,63 @@ public class DemoActivity extends ActionBarActivity {
 //            }
 //        });
         mLayout.setAnchorPoint(ANCHOR_OFFSET);
-
-//        TextView t = (TextView) findViewById(R.id.name);
-//        t.setText(Html.fromHtml(getString(R.string.hello)));
-//        Button f = (Button) findViewById(R.id.follow);
-//        f.setText(Html.fromHtml(getString(R.string.follow)));
-//        f.setMovementMethod(LinkMovementMethod.getInstance());
     }
     
-    private void initLv() {
-//        ListView lv = (ListView) findViewById(R.id.list);
-//        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(DemoActivity.this, "onItemClick", Toast.LENGTH_SHORT).show();
-////                startActivity(new Intent(DemoActivity.this, CustomActivity.class));
-//            }
-//        });
-//
-//        List<String> your_array_list = Arrays.asList(
-//                "This",
-//                "Is",
-//                "An",
-//                "Example",
-//                "ListView",
-//                "That",
-//                "You",
-//                "Can",
-//                "Scroll",
-//                ".",
-//                "It",
-//                "Shows",
-//                "How",
-//                "Any",
-//                "Scrollable",
-//                "View",
-//                "Can",
-//                "Be",
-//                "Included",
-//                "As",
-//                "A",
-//                "Child",
-//                "Of",
-//                "SlidingUpPanelLayout"
-//                                                    );
-//
-//        // This is the array adapter, it takes the context of the activity as a
-//        // first parameter, the type of list view as a second parameter and your
-//        // array as a third parameter.
-//        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
-//                this,
-//                android.R.layout.simple_list_item_1,
-//                your_array_list
-//        );
-//
-//        lv.setAdapter(arrayAdapter);
+    private void wrapMultiScrollableView() {
+        mLayout.addScrollableViewId(R.id.list, R.id.sv);
+        
+        ListView lv = (ListView) findViewById(R.id.list);
+        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Toast.makeText(DemoActivity.this, "onItemClick", Toast.LENGTH_SHORT).show();
+//                startActivity(new Intent(DemoActivity.this, CustomActivity.class));
+            }
+        });
+
+        List<String> your_array_list = Arrays.asList(
+                "This",
+                "Is",
+                "An",
+                "Example",
+                "ListView",
+                "That",
+                "You",
+                "Can",
+                "Scroll",
+                ".",
+                "It",
+                "Shows",
+                "How",
+                "Any",
+                "Scrollable",
+                "View",
+                "Can",
+                "Be",
+                "Included",
+                "As",
+                "A",
+                "Child",
+                "Of",
+                "SlidingUpPanelLayout"
+                                                    );
+
+        // This is the array adapter, it takes the context of the activity as a
+        // first parameter, the type of list view as a second parameter and your
+        // array as a third parameter.
+        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<>(
+                this,
+                android.R.layout.simple_list_item_1,
+                your_array_list
+        );
+
+        lv.setAdapter(arrayAdapter);
+    
+        TextView t = (TextView) findViewById(R.id.name);
+        t.setText(Html.fromHtml(getString(R.string.hello)));
+        Button f = (Button) findViewById(R.id.follow);
+        f.setText(Html.fromHtml(getString(R.string.follow)));
+        f.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
 

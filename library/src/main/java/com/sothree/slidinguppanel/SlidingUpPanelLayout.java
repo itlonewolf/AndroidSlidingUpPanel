@@ -3,7 +3,10 @@ package com.sothree.slidinguppanel;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.*;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,7 +15,6 @@ import android.support.annotation.FloatRange;
 import android.support.annotation.IdRes;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -148,12 +150,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * used for dragging.
      */
     private int mDragViewResId = -1;
-
-//    /**
-//     * If provided, the panel will transfer the scroll from this view to itself when needed.
-//     */
-//    private View mScrollableView;
-//    private int mScrollableViewResId;
     
     private Set<Integer> mScrollableIds ;
     private ScrollableViewHelper mScrollableViewHelper = new ScrollableViewHelper();
@@ -254,14 +250,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
          * @param panel       The child view that was moved
          * @param slideOffset The new offset of this sliding pane within its range, from 0-1
          */
-        public void onPanelSlide(View panel, float slideOffset);
+        void onPanelSlide(View panel, float slideOffset);
 
         /**
          * Called when a sliding panel state changes
          *
          * @param panel The child view that was slid to an collapsed position
          */
-        public void onPanelStateChanged(View panel, PanelState previousState, PanelState newState);
+        void onPanelStateChanged(View panel, PanelState previousState, PanelState newState);
     }
 
     /**
@@ -318,7 +314,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mCoveredFadeColor = ta.getColor(R.styleable.SlidingUpPanelLayout_umanoFadeColor, DEFAULT_FADE_COLOR);
 
                 mDragViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoDragView, -1);
-//                mScrollableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoScrollableView, -1);
     
                 mMainViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoMainView, -1);
                 mSlideableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoSlideableView, -1);
@@ -380,12 +375,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
         if (mSlideableViewResId != -1) {
             mSlideableView = findViewById(mSlideableViewResId);
-//            mSlideableView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//                @Override
-//                public void onGlobalLayout() {
-//                    Log.d("layoutglobal", String.format("mSlideableView measure height:%s", mSlideableView.getMeasuredHeight()));
-//                }
-//            });
         }
     
         if (mParallaxViewResId != -1) {
@@ -395,9 +384,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (mDragViewResId != -1) {
             setDragView(findViewById(mDragViewResId));
         }
-//        if (mScrollableViewResId != -1) {
-//            setScrollableView(findViewById(mScrollableViewResId));
-//        }
     
         if (mSlideableView == null) {
             throw new IllegalStateException("必须指定 slideable view");
@@ -466,7 +452,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (getPanelState() == PanelState.COLLAPSED) {
             smoothToBottom();
             invalidate();
-            return;
         }
     }
 
@@ -539,8 +524,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Adds a panel slide listener
-     *
-     * @param listener
      */
     public void addPanelSlideListener(PanelSlideListener listener) {
         synchronized (mPanelSlideListeners) {
@@ -550,8 +533,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Removes a panel slide listener
-     *
-     * @param listener
      */
     public void removePanelSlideListener(PanelSlideListener listener) {
         synchronized (mPanelSlideListeners) {
@@ -563,8 +544,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * Provides an on click for the portion of the main view that is dimmed. The listener is not
      * triggered if the panel is in a collapsed or a hidden position. If the on click listener is
      * not provided, the clicks on the dimmed area are passed through to the main layout.
-     *
-     * @param listener
      */
     public void setFadeOnClickListener(View.OnClickListener listener) {
         mFadeOnClickListener = listener;
@@ -599,7 +578,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     }
                 }
             });
-            ;
         }
     }
 
@@ -613,11 +591,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
         setDragView(findViewById(dragViewResId));
     }
     
-    public void addScrollableViewId(@IdRes int...scrollableViewId){
+    /**
+     * 添加可滚动的 view,支持多个;如果不设置,默认认为 umanoSlideableView 指定的 view 为可滚动的
+     */
+    public void addScrollableViewId(@IdRes int...scrollableViewIds){
         if (mScrollableIds == null) {
             mScrollableIds = new HashSet<>();
         }
-        for (int resId : scrollableViewId) {
+        for (int resId : scrollableViewIds) {
             if (!mScrollableIds.contains(resId)) {
                 mScrollableIds.add(resId);
             }
@@ -626,8 +607,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Sets the current scrollable view helper. See ScrollableViewHelper description for details.
-     *
-     * @param helper
      */
     public void setScrollableViewHelper(ScrollableViewHelper helper) {
         mScrollableViewHelper = helper;
@@ -639,7 +618,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * @param anchorPoint A value between 0 and 1, determining the position of the anchor point
      *                    starting from the top of the layout.
      */
-    public void setAnchorPoint(@FloatRange(from = 0,fromInclusive = false, to = 1.0f,toInclusive = true) float anchorPoint) {
+    public void setAnchorPoint(@FloatRange(from = 0,fromInclusive = false, to = 1.0f) float anchorPoint) {
         if (anchorPoint > 0 && anchorPoint <= 1) {
             mAnchorPoint = anchorPoint;
             mFirstLayout = true;
@@ -658,8 +637,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Sets whether or not the panel overlays the content
-     *
-     * @param overlayed
+     * 是否将 slideable view 覆盖在 main view 上;一般用在 slideable view 使用半透明效果时
      */
     public void setOverlayed(boolean overlayed) {
         mOverlayContent = overlayed;
@@ -674,8 +652,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Sets whether or not the main content is clipped to the top of the panel
-     *
-     * @param clip
      */
     public void setClipPanel(boolean clip) {
         mClipPanel = clip;
@@ -840,13 +816,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
 
         final int childCount = getChildCount();
-
-//        if (childCount != 2) {
-//            throw new IllegalStateException("Sliding up panel layout must have exactly 2 children!");
-//        }
-
-//        mMainView = getChildAt(0);
-//        mSlideableView = getChildAt(1);
         if (mDragView == null) {
             setDragView(mSlideableView);
         }
@@ -1148,16 +1117,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return super.dispatchTouchEvent(ev);
         }
     
-        final float x = ev.getX();
         final float y = ev.getY();
         Log.d("dispatch", "dispatchTouchEvent >>>");
         
         if (action == MotionEvent.ACTION_DOWN) {
-            
-//            if (!isViewUnder(mDragView, (int) x, (int) y)) {
-//                //idea 不在 dragview 的区域时,不做处理
-//                return false;
-//            }
             
             mIsScrollableViewHandlingTouch = false;
             mPrevMotionY = y;
@@ -1394,47 +1357,22 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mMainView.requestLayout();
             }
         }
-    
-//        if (mParallaxView != null) {
-//            if (mSlideOffset < mAnchorPoint) {
-//                Log.d("height", "getHeight >>>" + getHeight());
-//                Log.d("height", "getPanelHeight >>>" + getPanelHeight());
-////                Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
-//                Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
-//                float y = computeParallaxViewY();
-//                Log.d("onLayout", "onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
-////                Log.d("parallaxY", "本次计算的 computeParallaxViewY 值为:" + y);
-//                Log.d("parallaxY", String.format("computeParallaxViewY 值为: %s,  mParallaxView 的 top: %s", y, mParallaxView.getTop()));
-//                ViewCompat.setTranslationY(mParallaxView, y);
-//
-////                mParallaxView.requestLayout();
-//            }
-//        }
         
         applyParallax();
     
         Log.d("parallax", "onPanelDragged before requestLayout");
-//        logPanel("onPanelDragged");
-//        requestLayout();
-//        invalidate();
     }
     
     
     private void applyParallax(){
         if (mParallaxView != null) {
-//            if (mSlideOffset <= mAnchorPoint) {
                 Log.d("height", "getHeight >>>" + getHeight());
                 Log.d("height", "getPanelHeight >>>" + getPanelHeight());
-//                Log.d("height", "mParallaxView.getMeasuredHeight >>>" + mParallaxView.getMeasuredHeight());
                 Log.d("height", "mSlideOffset >>>>" + mSlideOffset);
                 float y = computeParallaxViewY();
                 Log.d("onLayout", "onPanelDragged 在 y 轴方向上需要移动的距离为:" + y);
-//                Log.d("parallaxY", "本次计算的 computeParallaxViewY 值为:" + y);
                 Log.d("parallaxY", String.format("computeParallaxViewY 值为: %s,  mParallaxView 的 top: %s", y, mParallaxView.getTop()));
                 ViewCompat.setTranslationY(mParallaxView, y);
-
-//                mParallaxView.requestLayout();
-//            }
         }
     }
     
@@ -1460,19 +1398,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         logPanel("compute parallax view y");
         
         return offset * slideRange;
-    }
-    
-    static Paint     paint = new Paint();
-    static TextPaint tpaint = new TextPaint();
-    
-    static {
-        paint.setColor(Color.CYAN);
-        paint.setStrokeWidth(20);
-        paint.setStyle(Paint.Style.STROKE);
-        
-//        tpaint.setTextSize(20);
-        tpaint.setColor(Color.BLUE);
-        
     }
 
     @Override
@@ -1520,20 +1445,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
 
             result = super.drawChild(canvas, child, drawingTime);
-
-//            if (mCoveredFadeColor != 0 && mSlideOffset > 0) {
-//                final int baseAlpha = (mCoveredFadeColor & 0xff000000) >>> 24;
-//                final int imag = (int) (baseAlpha * mSlideOffset);
-//                final int color = imag << 24 | (mCoveredFadeColor & 0xffffff);
-//                mCoveredFadePaint.setColor(color);
-//                canvas.drawRect(mTmpRect, mCoveredFadePaint);
-//            }
+    
+            if (child == mMainView) {
+                //idea 渐变颜色效果仅对 Main View 生效
+                if (mCoveredFadeColor != 0 && mSlideOffset > 0) {
+                    final int baseAlpha = (mCoveredFadeColor & 0xff000000) >>> 24;
+                    final int imag = (int) (baseAlpha * mSlideOffset);
+                    final int color = imag << 24 | (mCoveredFadeColor & 0xffffff);
+                    mCoveredFadePaint.setColor(color);
+                    canvas.drawRect(mTmpRect, mCoveredFadePaint);
+                }
+            }
         } else {
-            //idea 设置 slideable view 的默认颜色为白色
-//            if (child == mSlideableView && child.getBackground() == null) {
-//                child.setBackgroundColor(Color.WHITE);
-//            }
-            
             result = super.drawChild(canvas, child, drawingTime);
         }
 
@@ -1574,13 +1497,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
             ViewCompat.postInvalidateOnAnimation(this);
         }
     }
-    
-//
-//    static Paint mPaint = new Paint();
-//    static {
-//        mPaint.setColor(Color.RED);
-//        mPaint.setTextSize(30);
-//    }
     
     @Override
     public void draw(Canvas c) {
