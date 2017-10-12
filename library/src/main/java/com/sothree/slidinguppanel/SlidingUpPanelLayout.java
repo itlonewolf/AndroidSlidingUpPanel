@@ -3,10 +3,7 @@ package com.sothree.slidinguppanel;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.Rect;
+import android.graphics.*;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -781,6 +778,25 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     private static boolean hasOpaqueBackground(View v) {
         final Drawable bg = v.getBackground();
+        if (bg != null) {
+            Log.d("backgroundYee", "含有 background");
+            switch (bg.getOpacity()) {
+                case PixelFormat.OPAQUE:
+                    Log.d("backgroundYee", "Opacity >>> OPAQUE");
+                    break;
+                case PixelFormat.TRANSLUCENT:
+                    Log.d("backgroundYee", "Opacity >>> TRANSLUCENT");
+                    break;
+                case PixelFormat.TRANSPARENT:
+                    Log.d("backgroundYee", "Opacity >>> TRANSPARENT");
+                    break;
+                default:
+                    Log.d("backgroundYee", "Opacity >>> unknown");
+                    break;
+            }
+        } else {
+            Log.d("backgroundYee", "无 background");
+        }
         return bg != null && bg.getOpacity() == PixelFormat.OPAQUE;
     }
 
@@ -1480,6 +1496,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
 //                canvas.drawRect(mTmpRect, mCoveredFadePaint);
 //            }
         } else {
+            //idea 设置 slideable view 的默认颜色为白色
+            if (child == mSlideableView && child.getBackground() == null) {
+                child.setBackgroundColor(Color.WHITE);
+            }
+            
             result = super.drawChild(canvas, child, drawingTime);
         }
 
