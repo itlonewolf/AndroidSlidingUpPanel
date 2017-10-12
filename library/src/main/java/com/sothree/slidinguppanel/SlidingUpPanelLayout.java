@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.*;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IdRes;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -728,16 +730,22 @@ public class SlidingUpPanelLayout extends ViewGroup {
         //0,1080,1678,3543
         Log.d("update", String.format("leftBound:%s, topBound:%s, rightBound:%s, bottomBound:%s", leftBound, topBound, rightBound, bottomBound));
         
-        final int left;
-        final int right;
-        final int top;
-        final int bottom;
+        int left;
+        int right;
+        int top;
+        int bottom;
         
         if (mSlideableView != null && hasOpaqueBackground(mSlideableView)) {
             left    = mSlideableView.getLeft();
             top     = mSlideableView.getTop();
             right   = mSlideableView.getRight();
             bottom  = mSlideableView.getBottom();
+    
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                if (mParallaxView != null) {
+                    top = (int) mParallaxView.getY();
+                }
+            }
         } else {
             left = right = top = bottom = 0;
         }
@@ -1453,13 +1461,26 @@ public class SlidingUpPanelLayout extends ViewGroup {
         
         return offset * slideRange;
     }
+    
+    static Paint     paint = new Paint();
+    static TextPaint tpaint = new TextPaint();
+    
+    static {
+        paint.setColor(Color.CYAN);
+        paint.setStrokeWidth(20);
+        paint.setStyle(Paint.Style.STROKE);
+        
+//        tpaint.setTextSize(20);
+        tpaint.setColor(Color.BLUE);
+        
+    }
 
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
         boolean                                  result;
         @SuppressLint("WrongConstant") final int save = canvas.save(Canvas.CLIP_SAVE_FLAG);
 
-        if (mSlideableView != null && mSlideableView != child) { // if main view
+        if (mSlideableView != null && mSlideableView != child) { // if main view or parallax view
             
             // Clip against the slider; no sense drawing what will immediately be covered,
             // Unless the panel is set to overlay content
@@ -1474,11 +1495,23 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     if (mParallaxView == null || child == mParallaxView) {
                         mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());
                     } else {
-                        mTmpRect.bottom = Math.min(mTmpRect.bottom, mParallaxView.getTop());
+                        //idea 对于 Main View 来讲,纵向实际绘制的范围时: 0~mParallaxView.getY()
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                            mTmpRect.bottom = (int) Math.min(mTmpRect.bottom, mParallaxView.getY());
+                        } else {
+                            mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());
+                        }
                     }
                 } else {
                     mTmpRect.top = Math.max(mTmpRect.top, mSlideableView.getBottom());
                 }
+            } else if (child == mParallaxView) {
+                //idea 避免半透明模式时,收起状态下 slideable view 与 parallax view 会一起显示
+                
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    mTmpRect.top = (int) Math.max(mTmpRect.top, mParallaxView.getY());
+                }
+                mTmpRect.bottom = Math.min(mTmpRect.bottom, mSlideableView.getTop());
             }
             // ▲ //idea mOverlayContent 属性的设置,实际影响此段代码 xiaoyee ▲
             
@@ -1497,9 +1530,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
 //            }
         } else {
             //idea 设置 slideable view 的默认颜色为白色
-            if (child == mSlideableView && child.getBackground() == null) {
-                child.setBackgroundColor(Color.WHITE);
-            }
+//            if (child == mSlideableView && child.getBackground() == null) {
+//                child.setBackgroundColor(Color.WHITE);
+//            }
             
             result = super.drawChild(canvas, child, drawingTime);
         }
