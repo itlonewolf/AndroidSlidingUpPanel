@@ -1,0 +1,21 @@
+{
+  "isLogOpened": true,
+  "tags": [
+	{
+	  "tag": "layout",
+	  "isEnable": true
+	},
+	{
+	  "tag": "measure",
+	  "isEnable": true
+	},
+	{
+	  "tag": "draw",
+	  "isEnable": true
+	},
+	{
+	  "tag": "demo",
+	  "isEnable": true
+	}
+  ]
+}
