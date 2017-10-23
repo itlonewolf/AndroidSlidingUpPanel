@@ -13,6 +13,9 @@
 
         sothree:umanoMainView="@+id/main_view"
         sothree:umanoSlideableView="@+id/sliding_view"
+        sothree:umanoExpandedStateTop="80dp"
+
+
 
 
 >
