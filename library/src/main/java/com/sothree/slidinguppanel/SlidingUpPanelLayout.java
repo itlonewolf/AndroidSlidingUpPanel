@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
-
 import com.sothree.slidinguppanel.library.R;
 
 import java.util.List;
@@ -156,11 +155,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * The child view that can slide, if any.
      */
     private View mSlideableView;
+    private int  mSlideableViewResId;
 
     /**
      * The main view
      */
     private View mMainView;
+    private int  mMainViewResId;
 
     /**
      * Current state of the slideable view.
@@ -300,6 +301,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
                 mDragViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoDragView, -1);
                 mScrollableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoScrollableView, -1);
+    
+                mSlideableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoSlideableView, -1);
+                mMainViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoMainView, -1);
 
                 mOverlayContent = ta.getBoolean(R.styleable.SlidingUpPanelLayout_umanoOverlay, DEFAULT_OVERLAY_FLAG);
                 mClipPanel = ta.getBoolean(R.styleable.SlidingUpPanelLayout_umanoClipPanel, DEFAULT_CLIP_PANEL_FLAG);
@@ -356,6 +360,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
         if (mScrollableViewResId != -1) {
             setScrollableView(findViewById(mScrollableViewResId));
+        }
+    
+        if (mMainViewResId != -1) {
+            mMainView = findViewById(mMainViewResId);
+        }
+    
+        if (mSlideableViewResId != -1) {
+            mSlideableView = findViewById(mSlideableViewResId);
+        }
+    
+        if (mSlideableView == null) {
+            throw new IllegalArgumentException("mSlideableView 是必须设置的");
         }
     }
 
@@ -659,7 +675,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     }
 
     void updateObscuredViewVisibility() {
-        if (getChildCount() == 0) {
+        //idea 修改此处解决了不设置 main view 时, slideable view 也无法显示的问题
+        if (mMainView == null) {
             return;
         }
         final int leftBound = getPaddingLeft();
@@ -733,13 +750,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
 
         final int childCount = getChildCount();
-
-        if (childCount != 2) {
-            throw new IllegalStateException("Sliding up panel layout must have exactly 2 children!");
-        }
-
-        mMainView = getChildAt(0);
-        mSlideableView = getChildAt(1);
+    
         if (mDragView == null) {
             setDragView(mSlideableView);
         }
@@ -1131,9 +1142,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     @SuppressLint("NewApi")
     private void applyParallaxForCurrentSlideOffset() {
-        if (mParallaxOffset > 0) {
-            int mainViewOffset = getCurrentParallaxOffset();
-            ViewCompat.setTranslationY(mMainView, mainViewOffset);
+        if (mMainView != null) {
+            if (mParallaxOffset > 0) {
+                int mainViewOffset = getCurrentParallaxOffset();
+                ViewCompat.setTranslationY(mMainView, mainViewOffset);
+            }
         }
     }
 
@@ -1147,28 +1160,32 @@ public class SlidingUpPanelLayout extends ViewGroup {
         applyParallaxForCurrentSlideOffset();
         // Dispatch the slide event
         dispatchOnPanelSlide(mSlideableView);
-        // If the slide offset is negative, and overlay is not on, we need to increase the
-        // height of the main content
-        LayoutParams lp = (LayoutParams) mMainView.getLayoutParams();
-        int defaultHeight = getHeight() - getPaddingBottom() - getPaddingTop() - mPanelHeight;
-
-        if (mSlideOffset <= 0 && !mOverlayContent) {
-            // expand the main view
-            lp.height = mIsSlidingUp ? (newTop - getPaddingBottom()) : (getHeight() - getPaddingBottom() - mSlideableView.getMeasuredHeight() - newTop);
-            if (lp.height == defaultHeight) {
+    
+        if (mMainView != null) {
+            // If the slide offset is negative, and overlay is not on, we need to increase the
+            // height of the main content
+            LayoutParams lp            = (LayoutParams) mMainView.getLayoutParams();
+            int          defaultHeight = getHeight() - getPaddingBottom() - getPaddingTop() - mPanelHeight;
+        
+            if (mSlideOffset <= 0 && !mOverlayContent) {
+                // expand the main view
+                lp.height = mIsSlidingUp ? (newTop - getPaddingBottom()) : (getHeight() - getPaddingBottom() - mSlideableView.getMeasuredHeight() - newTop);
+                if (lp.height == defaultHeight) {
+                    lp.height = LayoutParams.MATCH_PARENT;
+                }
+                mMainView.requestLayout();
+            } else if (lp.height != LayoutParams.MATCH_PARENT && !mOverlayContent) {
                 lp.height = LayoutParams.MATCH_PARENT;
+                mMainView.requestLayout();
             }
-            mMainView.requestLayout();
-        } else if (lp.height != LayoutParams.MATCH_PARENT && !mOverlayContent) {
-            lp.height = LayoutParams.MATCH_PARENT;
-            mMainView.requestLayout();
         }
     }
 
     @Override
     protected boolean drawChild(Canvas canvas, View child, long drawingTime) {
         boolean result;
-        final int save = canvas.save(Canvas.CLIP_SAVE_FLAG);
+    
+        @SuppressLint("WrongConstant") final int save = canvas.save(Canvas.CLIP_SAVE_FLAG);
 
         if (mSlideableView != null && mSlideableView != child) { // if main view
             // Clip against the slider; no sense drawing what will immediately be covered,
