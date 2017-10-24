@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.*;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
-import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelSlideListener;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
 import java.util.Arrays;
@@ -22,6 +21,10 @@ public class DemoActivity extends ActionBarActivity {
     private static final String TAG = "DemoActivity";
 
     private SlidingUpPanelLayout mLayout;
+
+//    private View leadingView;
+
+//    private View viewWaiting2Show;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,15 +79,33 @@ public class DemoActivity extends ActionBarActivity {
         lv.setAdapter(arrayAdapter);
 
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        mLayout.addPanelSlideListener(new PanelSlideListener() {
-            @Override
-            public void onPanelSlide(View panel, float slideOffset) {
-            }
-
-            @Override
-            public void onPanelStateChanged(View panel, PanelState previousState, PanelState newState) {
-            }
-        });
+//        leadingView = findViewById(R.id.collapsed_view);
+//        viewWaiting2Show = findViewById(R.id.sliding_view);
+//
+//        mLayout.addPanelSlideListener(new PanelSlideListener() {
+//            @Override
+//            public void onPanelSlide(View panel, float slideOffset) {
+//                if (slideOffset > 0) {
+//                    if (leadingView.getVisibility() != View.INVISIBLE) {
+//                        leadingView.setVisibility(View.INVISIBLE);
+//                        viewWaiting2Show.setVisibility(View.VISIBLE);
+//                        mLayout.requestLayout();
+//                    }
+//                } else {
+//                    if (leadingView.getVisibility() != View.VISIBLE) {
+//                        leadingView.setVisibility(View.VISIBLE);
+//                        viewWaiting2Show.setVisibility(View.INVISIBLE);
+//                        mLayout.requestLayout();
+//                    }
+//                }
+//
+//            }
+//
+//            @Override
+//            public void onPanelStateChanged(View panel, PanelState previousState, PanelState newState) {
+//
+//            }
+//        });
     
         mLayout.setAnchorPoint(0.7f);
         mLayout.setFadeOnClickListener(new OnClickListener() {

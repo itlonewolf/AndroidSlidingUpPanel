@@ -16,6 +16,14 @@
 	{
 	  "tag": "demo",
 	  "isEnable": true
+	},
+	{
+	  "tag": "drag",
+	  "isEnable": true
+	},
+	{
+	  "tag": "capture",
+	  "isEnable": true
 	}
   ]
 }

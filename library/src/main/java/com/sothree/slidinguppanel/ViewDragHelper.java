@@ -22,12 +22,9 @@ import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.VelocityTrackerCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
-import android.view.MotionEvent;
-import android.view.VelocityTracker;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.ViewGroup;
+import android.view.*;
 import android.view.animation.Interpolator;
+import com.sothree.slidinguppanel.log.Logger;
 
 import java.util.Arrays;
 
@@ -1003,6 +1000,10 @@ public class ViewDragHelper {
                 saveInitialMotion(x, y, pointerId);
 
                 final View toCapture = findTopChildUnder((int) x, (int) y);
+                if (Logger.isTagEnabled("drag")) {
+                    Logger.d("drag", String.format("viewDragHelper captured view:%s", toCapture));
+                }
+                
 
                 // Catch a settling view if possible.
                 if (toCapture == mCapturedView && mDragState == STATE_SETTLING) {
@@ -1428,7 +1429,7 @@ public class ViewDragHelper {
             clampedY = mCallback.clampViewPositionVertical(mCapturedView, top, dy);
             mCapturedView.offsetTopAndBottom(clampedY - oldTop);
         }
-
+    
         if (dx != 0 || dy != 0) {
             final int clampedDx = clampedX - oldLeft;
             final int clampedDy = clampedY - oldTop;
@@ -1468,7 +1469,13 @@ public class ViewDragHelper {
                 y >= view.getTop() &&
                 y < view.getBottom();
     }
-
+    
+    private View notContainView;
+    
+    public void setNotContainView(View view) {
+        this.notContainView = view;
+    }
+    
     /**
      * Find the topmost child under the given point within the parent view's coordinate system.
      * The child order is determined using {@link Callback#getOrderedChildIndex(int)}.
@@ -1481,6 +1488,9 @@ public class ViewDragHelper {
         final int childCount = mParentView.getChildCount();
         for (int i = childCount - 1; i >= 0; i--) {
             final View child = mParentView.getChildAt(mCallback.getOrderedChildIndex(i));
+            if (child == notContainView) {
+                continue;
+            }
             if (x >= child.getLeft() && x < child.getRight() &&
                     y >= child.getTop() && y < child.getBottom()) {
                 return child;

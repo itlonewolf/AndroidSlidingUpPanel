@@ -10,6 +10,7 @@
         <attr name="umanoFlingVelocity" format="integer" />
         <attr name="umanoDragView" format="reference" />
         <attr name="umanoScrollableView" format="reference" />
+        <attr name="umanoCollapsedView" format="reference"/>
 
         <attr name="umanoMainView" format="reference"/>
         <attr name="umanoSlideableView" format="reference"/>
