@@ -363,8 +363,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
 
         setWillNotDraw(false);
-
-        mDragHelper = ViewDragHelper.create(this, 0.5f, scrollerInterpolator, new DragHelperCallback());
+    
+        mDragHelper = ViewDragHelper.create(this, 1f, scrollerInterpolator, new DragHelperCallback());
         mDragHelper.setMinVelocity(mMinFlingVelocity * density);
 
         mIsTouchEnabled = true;
@@ -602,7 +602,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     }
                 }
             });
-            ;
         }
     }
 
@@ -1038,13 +1037,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return false;
         }
     }
-    
-    boolean isCollapsedGone = false;
-    
-    private void collapsedViewGone() {
-        mCollapsedView.setVisibility(GONE);
-        isCollapsedGone = true;
-    }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -1223,7 +1215,15 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 || (!mFirstLayout && mSlideableView == null)
                 || state == mSlideState
                 || mSlideState == PanelState.DRAGGING) return;
-
+    
+        if (Logger.isTagEnabled("drag")) {
+            Logger.d("drag", "设置当前 panel state 为: %s", state);
+        }
+    
+        if (PanelState.COLLAPSED != state) {
+            collapsedViewGone();
+        }
+        
         if (mFirstLayout) {
             setPanelStateInternal(state);
         } else {
@@ -1247,6 +1247,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     break;
             }
         }
+    }
+    
+    boolean isCollapsedGone = false;
+    
+    private void collapsedViewGone() {
+        mCollapsedView.setVisibility(GONE);
+        isCollapsedGone = true;
     }
     
     private void resetCollapsedView() {

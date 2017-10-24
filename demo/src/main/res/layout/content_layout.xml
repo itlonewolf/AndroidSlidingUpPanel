@@ -54,15 +54,30 @@
     </LinearLayout>
 
     <!--COLLAPSED VIEW-->
-    <TextView
-            android:id="@+id/collapsed_view"
+    <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:text="@string/action_anchor_disable"
-            android:background="#ffff0000"
-            android:textSize="30sp"
-            android:gravity="center"
-    />
+            android:layout_height="wrap_content"
+            android:id="@+id/collapsed_view"
+            android:orientation="vertical"
+    >
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:text="@string/action_anchor_disable"
+                android:background="#ffff0000"
+                android:textSize="30sp"
+                android:gravity="center"
+        />
+        <!--<Button-->
+        <!--android:id="@+id/btnInCollapsed"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:text="@string/action_anchor_disable"-->
+        <!--android:background="#ffff0000"-->
+        <!--android:textSize="30sp"-->
+        <!--android:gravity="center"-->
+        <!--/>-->
+    </LinearLayout>
 
 
 </merge>
