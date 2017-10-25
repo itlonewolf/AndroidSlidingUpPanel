@@ -237,8 +237,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     private final List<PanelSlideListener> mPanelSlideListeners = new CopyOnWriteArrayList<>();
     private View.OnClickListener mFadeOnClickListener;
-
+    
     private final ViewDragHelper mDragHelper;
+    private       float          mDragSlop;
 
     /**
      * Stores whether or not the pane was expanded the last time it was slideable.
@@ -278,10 +279,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         } else {
             setPanelState(PanelState.COLLAPSED);
         }
-    }
-    
-    public void demoListener() {
-        mOnCollapsedViewClickListener.onClick(this);
     }
     
     public interface OnViewVisibilityChangeListener {
@@ -447,6 +444,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     
         mDragHelper.setNotContainView(mCollapsedView);
+    
+        mDragSlop = mDragHelper.getTouchSlop();
     }
 
     public void setGravity(int gravity) {
@@ -1008,8 +1007,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         final float rawX   = ev.getRawX();
         final float rawY   = ev.getRawY();
         
-        final int dragSlop = mDragHelper.getTouchSlop();
-    
         String actionType = "未知";
 
         switch (action) {
@@ -1033,7 +1030,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             case MotionEvent.ACTION_MOVE: {
                 actionType = "move";
-                if (ady > dragSlop && adx > ady) {
+                if (ady > mDragSlop && adx > ady) {
                     mDragHelper.cancel();
                     mIsUnableToDrag = true;
                     return false;
@@ -1053,7 +1050,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 }
     
                 //idea 在"滑动阈值"以内
-                final boolean underDragSlop = ady <= dragSlop && adx <= dragSlop;
+                final boolean underDragSlop = ady <= mDragSlop && adx <= mDragSlop;
                 
                 // Check if this was a click on the faded part of the screen, and fire off the listener if there is one.
     
@@ -1163,8 +1160,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mPrevMotionY = y;
     
             //idea 向上滑动时才判断,否则无意义
-            final int     dragSlop      = mDragHelper.getTouchSlop();
-            final boolean underDragSlop = ady <= dragSlop && adx <= dragSlop;
+    
+            final boolean underDragSlop = ady <= mDragSlop && adx <= mDragSlop;
     
             if (mCollapsedView != null && dy < 0 && !underDragSlop) {
                 final boolean underCollapsedView = isViewUnder(mCollapsedView, (int) mInitialMotionX, (int) mInitialMotionY);
@@ -1256,8 +1253,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
     
     
-            final int     dragSlop      = mDragHelper.getTouchSlop();
-            final boolean underDragSlop = ady <= dragSlop && adx <= dragSlop;
+            final boolean underDragSlop = ady <= mDragSlop && adx <= mDragSlop;
             //idea 发生在 collapsed view 上的非滑动事件由 collapsed view 自己处理
             final boolean underCollapsedView = ViewUtil.isTouchPointInView(mCollapsedView, (int) rawX, (int) rawY);
             if (underDragSlop && underCollapsedView) {
