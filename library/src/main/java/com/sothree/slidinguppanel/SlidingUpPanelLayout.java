@@ -1406,7 +1406,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     }
     
-    private void onPanelDragged(int newTop, View draggingView) {
+    private void onPanelDragged(int newTop) {
         if (mSlideState != PanelState.DRAGGING) {
             mLastNotDraggingSlideState = mSlideState;
         }
@@ -1663,8 +1663,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     Logger.d("drag", "Slideable view dragging top:%s", top);
                 }
             }
-        
-            onPanelDragged(top, changedView);
+    
+            onPanelDragged(top);
             invalidate();
         }
 
