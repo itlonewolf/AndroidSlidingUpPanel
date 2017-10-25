@@ -80,13 +80,14 @@ public class DemoActivity extends ActionBarActivity {
         lv.setAdapter(arrayAdapter);
 
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-//        btnInCollapsed = (Button) findViewById(R.id.btnInCollapsed);
-//        btnInCollapsed.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(getApplicationContext(), "btnInCollapsed", Toast.LENGTH_SHORT).show();
-//            }
-//        });
+        btnInCollapsed = (Button) findViewById(R.id.btnInCollapsed);
+        btnInCollapsed.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getApplicationContext(), "btnInCollapsed", Toast.LENGTH_SHORT).show();
+//                mLayout.demoListener();
+            }
+        });
 //        leadingView = findViewById(R.id.collapsed_view);
 //        viewWaiting2Show = findViewById(R.id.sliding_view);
 //

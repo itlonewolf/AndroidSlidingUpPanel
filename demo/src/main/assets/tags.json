@@ -24,6 +24,10 @@
 	{
 	  "tag": "capture",
 	  "isEnable": true
+	},
+	{
+	  "tag": "touch",
+	  "isEnable": true
 	}
   ]
 }

@@ -1006,6 +1006,7 @@ public class ViewDragHelper {
                 
 
                 // Catch a settling view if possible.
+                //idea 尝试捕捉一个处理 setting 状态的 view
                 if (toCapture == mCapturedView && mDragState == STATE_SETTLING) {
                     tryCaptureViewForDrag(toCapture, pointerId);
                 }
@@ -1034,6 +1035,7 @@ public class ViewDragHelper {
                     // Catch a settling view if possible.
                     final View toCapture = findTopChildUnder((int) x, (int) y);
                     if (toCapture == mCapturedView) {
+                        //idea 尝试捕捉一个处理 setting 状态的 view
                         tryCaptureViewForDrag(toCapture, pointerId);
                     }
                 }

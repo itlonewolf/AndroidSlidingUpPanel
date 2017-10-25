@@ -23,6 +23,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.Interpolator;
 import com.sothree.slidinguppanel.library.R;
 import com.sothree.slidinguppanel.log.Logger;
+import com.sothree.slidinguppanel.util.ViewUtil;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -228,6 +229,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private float mPrevMotionY;
     private float mInitialMotionX;
     private float mInitialMotionY;
+    
+    private float mInitialXInDispatch;
+    private float mInitialYInDispatch;
+    
     private boolean mIsScrollableViewHandlingTouch = false;
 
     private final List<PanelSlideListener> mPanelSlideListeners = new CopyOnWriteArrayList<>();
@@ -243,6 +248,48 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private boolean mFirstLayout = true;
 
     private final Rect mTmpRect = new Rect();
+    
+    private OnViewVisibilityChangeListener mVisibilityChangeListener;
+    
+    private OnClickListener mOnDragViewClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if (mSlideState != PanelState.COLLAPSED || mCollapsedView == null) {
+                changePanelState();
+            }
+        }
+    };
+    
+    private OnClickListener mOnCollapsedViewClickListener = new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            changePanelState();
+        }
+    };
+    
+    private void changePanelState() {
+        if (!isEnabled() || !isTouchEnabled()) return;
+        if (mSlideState != PanelState.EXPANDED && mSlideState != PanelState.ANCHORED) {
+            if (mAnchorPoint < 1.0f) {
+                setPanelState(PanelState.ANCHORED);
+            } else {
+                setPanelState(PanelState.EXPANDED);
+            }
+        } else {
+            setPanelState(PanelState.COLLAPSED);
+        }
+    }
+    
+    public void demoListener() {
+        mOnCollapsedViewClickListener.onClick(this);
+    }
+    
+    public interface OnViewVisibilityChangeListener {
+        /**
+         * 目前的 visibility 只有两种,{@link View#GONE} 和 {@link View#VISIBLE}
+         */
+        void onVisibilityChange(int visibility);
+    }
 
     /**
      * Listener for monitoring events about sliding panes.
@@ -254,14 +301,14 @@ public class SlidingUpPanelLayout extends ViewGroup {
          * @param panel       The child view that was moved
          * @param slideOffset The new offset of this sliding pane within its range, from 0-1
          */
-        public void onPanelSlide(View panel, float slideOffset);
+        void onPanelSlide(View panel, float slideOffset);
 
         /**
          * Called when a sliding panel state changes
          *
          * @param panel The child view that was slid to an collapsed position
          */
-        public void onPanelStateChanged(View panel, PanelState previousState, PanelState newState);
+        void onPanelStateChanged(View panel, PanelState previousState, PanelState newState);
     }
 
     /**
@@ -542,19 +589,20 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Adds a panel slide listener
-     *
-     * @param listener
      */
     public void addPanelSlideListener(PanelSlideListener listener) {
         synchronized (mPanelSlideListeners) {
             mPanelSlideListeners.add(listener);
         }
     }
+    
+    public void setOnCollapsedViewVisibilityChangeListener(OnViewVisibilityChangeListener listener) {
+        this.mVisibilityChangeListener = listener;
+    }
 
     /**
      * Removes a panel slide listener
      *
-     * @param listener
      */
     public void removePanelSlideListener(PanelSlideListener listener) {
         synchronized (mPanelSlideListeners) {
@@ -566,8 +614,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * Provides an on click for the portion of the main view that is dimmed. The listener is not
      * triggered if the panel is in a collapsed or a hidden position. If the on click listener is
      * not provided, the clicks on the dimmed area are passed through to the main layout.
-     *
-     * @param listener
      */
     public void setFadeOnClickListener(View.OnClickListener listener) {
         mFadeOnClickListener = listener;
@@ -587,21 +633,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mDragView.setClickable(true);
             mDragView.setFocusable(false);
             mDragView.setFocusableInTouchMode(false);
-            mDragView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (!isEnabled() || !isTouchEnabled()) return;
-                    if (mSlideState != PanelState.EXPANDED && mSlideState != PanelState.ANCHORED) {
-                        if (mAnchorPoint < 1.0f) {
-                            setPanelState(PanelState.ANCHORED);
-                        } else {
-                            setPanelState(PanelState.EXPANDED);
-                        }
-                    } else {
-                        setPanelState(PanelState.COLLAPSED);
-                    }
-                }
-            });
+            mDragView.setOnClickListener(mOnDragViewClickListener);
         }
     }
 
@@ -968,15 +1000,21 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return false;
         }
 
-        final int action = MotionEventCompat.getActionMasked(ev);
-        final float x = ev.getX();
-        final float y = ev.getY();
-        final float adx = Math.abs(x - mInitialMotionX);
-        final float ady = Math.abs(y - mInitialMotionY);
+        final int   action = MotionEventCompat.getActionMasked(ev);
+        final float x      = ev.getX();
+        final float y      = ev.getY();
+        final float adx    = Math.abs(x - mInitialMotionX);
+        final float ady    = Math.abs(y - mInitialMotionY);
+        final float rawX   = ev.getRawX();
+        final float rawY   = ev.getRawY();
+        
         final int dragSlop = mDragHelper.getTouchSlop();
+    
+        String actionType = "未知";
 
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
+                actionType = "down";
                 mIsUnableToDrag = false;
                 mInitialMotionX = x;
                 mInitialMotionY = y;
@@ -994,6 +1032,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
 
             case MotionEvent.ACTION_MOVE: {
+                actionType = "move";
                 if (ady > dragSlop && adx > ady) {
                     mDragHelper.cancel();
                     mIsUnableToDrag = true;
@@ -1004,6 +1043,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP:
+                actionType = "cancel | up";
                 // If the dragView is still dragging when we get here, we need to call processTouchEvent
                 // so that the view is settled
                 // Added to make scrollable views work (tokudu)
@@ -1011,17 +1051,34 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     mDragHelper.processTouchEvent(ev);
                     return true;
                 }
+    
+                //idea 在"滑动阈值"以内
+                final boolean underDragSlop = ady <= dragSlop && adx <= dragSlop;
+                
                 // Check if this was a click on the faded part of the screen, and fire off the listener if there is one.
-                if (ady <= dragSlop
-                        && adx <= dragSlop
-                        && mSlideOffset > 0 && !isViewUnder(mSlideableView, (int) mInitialMotionX, (int) mInitialMotionY) && mFadeOnClickListener != null) {
+    
+                final boolean notUnderSlideableView = !isViewUnder(mSlideableView, (int) mInitialMotionX, (int) mInitialMotionY);
+    
+                if (underDragSlop && mSlideOffset > 0 && notUnderSlideableView && mFadeOnClickListener != null) {
+        
+                    if (Logger.isTagEnabled("touch")) {
+                        Logger.d("touch", "fade view clicked");
+                    }
+                    
                     playSoundEffect(android.view.SoundEffectConstants.CLICK);
                     mFadeOnClickListener.onClick(this);
                     return true;
                 }
                 break;
         }
-        return mDragHelper.shouldInterceptTouchEvent(ev);
+    
+        final boolean shouldIntercept = mDragHelper.shouldInterceptTouchEvent(ev);
+        if (Logger.isTagEnabled("touch")) {
+            Logger.d("touch", "on intercept event 方法中是否需要拦截:%s, 事件类型:%s", shouldIntercept, actionType);
+        
+        }
+    
+        return shouldIntercept;
     }
 
     @Override
@@ -1029,6 +1086,44 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (!isEnabled() || !isTouchEnabled()) {
             return super.onTouchEvent(ev);
         }
+    
+        final float x    = ev.getX();
+        final float y    = ev.getY();
+        final float rawX = ev.getRawX();
+        final float rawY = ev.getRawY();
+        final float adx  = Math.abs(x - mInitialXInDispatch);
+        final float ady  = Math.abs(y - mInitialYInDispatch);
+    
+        if (Logger.isTagEnabled("touch")) {
+            Logger.d("touch", "called onTouchEvent");
+        }
+    
+    
+        //idea 非拖拽状态判断触摸发生在 collapsed view 范围内
+        if (ev.getAction() == MotionEvent.ACTION_UP) {
+        
+            final float dragSlop = mDragHelper.getTouchSlop();
+            //idea 在"滑动阈值"以内
+            final boolean underDragSlop = ady <= dragSlop && adx <= dragSlop;
+            if (!mDragHelper.isDragging() && underDragSlop) {
+                if (ViewUtil.isTouchPointInView(mCollapsedView, (int) rawX, (int) rawY)) {
+                    final View touchableViewInCollapsedView = ViewUtil.getTouchTarget(mCollapsedView, (int) rawX, (int) rawY);
+                    if (touchableViewInCollapsedView != null) {
+                        touchableViewInCollapsedView.callOnClick();
+                        if (Logger.isTagEnabled("touch")) {
+                            Logger.d("touch", "collapsed view 中的 %s 被点中了", touchableViewInCollapsedView);
+                        }
+                    } else {
+                        mOnCollapsedViewClickListener.onClick(this);
+                        if (Logger.isTagEnabled("touch")) {
+                            Logger.d("touch", "collapsed view 被点击了");
+                        }
+                    }
+                    return true;
+                }
+            }
+        }
+        
         try {
             mDragHelper.processTouchEvent(ev);
             return true;
@@ -1046,13 +1141,20 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mDragHelper.abort();
             return super.dispatchTouchEvent(ev);
         }
-
-        final float y = ev.getY();
+    
+        final float x    = ev.getX();
+        final float y    = ev.getY();
+        final float adx  = Math.abs(x - mInitialXInDispatch);
+        final float ady  = Math.abs(y - mInitialYInDispatch);
+        final float rawX = ev.getRawX();
+        final float rawY = ev.getRawY();
 
         if (action == MotionEvent.ACTION_DOWN) {
             if (Logger.isTagEnabled("drag")) {
                 Logger.d("drag", "dispatchTouchEvent down");
             }
+            mInitialXInDispatch = x;
+            mInitialYInDispatch = y;
             
             mIsScrollableViewHandlingTouch = false;
             mPrevMotionY = y;
@@ -1061,14 +1163,17 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mPrevMotionY = y;
     
             //idea 向上滑动时才判断,否则无意义
-            if (mCollapsedView != null && dy < 0) {
+            final int     dragSlop      = mDragHelper.getTouchSlop();
+            final boolean underDragSlop = ady <= dragSlop && adx <= dragSlop;
+    
+            if (mCollapsedView != null && dy < 0 && !underDragSlop) {
                 final boolean underCollapsedView = isViewUnder(mCollapsedView, (int) mInitialMotionX, (int) mInitialMotionY);
                 if (underCollapsedView && !isCollapsedGone) {
                     if (Logger.isTagEnabled("drag")) {
                         Logger.d("drag", "dispatchTouchEvent move collapsed view");
                     }
                     collapsedViewGone();
-            
+    
                 }
             }
     
@@ -1149,6 +1254,25 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (mIsScrollableViewHandlingTouch) {
                 mDragHelper.setDragState(ViewDragHelper.STATE_IDLE);
             }
+    
+    
+            final int     dragSlop      = mDragHelper.getTouchSlop();
+            final boolean underDragSlop = ady <= dragSlop && adx <= dragSlop;
+            //idea 发生在 collapsed view 上的非滑动事件由 collapsed view 自己处理
+            final boolean underCollapsedView = ViewUtil.isTouchPointInView(mCollapsedView, (int) rawX, (int) rawY);
+            if (underDragSlop && underCollapsedView) {
+                if (Logger.isTagEnabled("touch")) {
+                    Logger.d("touch", "非滑动,且在 collapsed view 范围内");
+                }
+        
+                mDragHelper.cancel();
+                return this.onTouchEvent(ev);
+            } else {
+                if (Logger.isTagEnabled("touch")) {
+                    Logger.d("touch", "滑动或者不在 collapsed view 范围内");
+                }
+            }
+            
         }
 
         // In all other cases, just let the default behavior take over.
@@ -1217,7 +1341,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 || mSlideState == PanelState.DRAGGING) return;
     
         if (Logger.isTagEnabled("drag")) {
-            Logger.d("drag", "设置当前 panel state 为: %s", state);
+            Logger.d("drag", "想设置当前 panel state 为: %s", state);
         }
     
         if (PanelState.COLLAPSED != state) {
@@ -1252,13 +1376,21 @@ public class SlidingUpPanelLayout extends ViewGroup {
     boolean isCollapsedGone = false;
     
     private void collapsedViewGone() {
-        mCollapsedView.setVisibility(GONE);
+        if (mCollapsedView != null) {
+            mCollapsedView.setVisibility(GONE);
+            if (mVisibilityChangeListener != null) {
+                mVisibilityChangeListener.onVisibilityChange(GONE);
+            }
+        }
         isCollapsedGone = true;
     }
     
     private void resetCollapsedView() {
         if (mCollapsedView != null) {
             mCollapsedView.setVisibility(VISIBLE);
+            if (mVisibilityChangeListener != null) {
+                mVisibilityChangeListener.onVisibilityChange(VISIBLE);
+            }
         }
         isCollapsedGone = false;
     }
