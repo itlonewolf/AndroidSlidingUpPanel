@@ -1100,7 +1100,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
             //idea 在"滑动阈值"以内
             final boolean underDragSlop = ady <= dragSlop && adx <= dragSlop;
             if (!mDragHelper.isDragging() && underDragSlop) {
-                if (ViewUtil.isTouchPointInView(mCollapsedView, (int) rawX, (int) rawY)) {
+                final View childOfCollapsedUnderTouch = ViewUtil.findChildUnderThis(mCollapsedView, (int) rawX, (int) rawY);
+    
+                if (childOfCollapsedUnderTouch != null) {
                     final View touchableViewInCollapsedView = ViewUtil.getTouchTarget(mCollapsedView, (int) rawX, (int) rawY);
                     if (touchableViewInCollapsedView != null) {
                         touchableViewInCollapsedView.callOnClick();
@@ -1250,8 +1252,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
             final boolean underDragSlop = ady <= mDragSlop && adx <= mDragSlop;
             //idea 发生在 collapsed view 上的非滑动事件由 collapsed view 自己处理
-            final boolean underCollapsedView = ViewUtil.isTouchPointInView(mCollapsedView, (int) rawX, (int) rawY);
-            if (underDragSlop && underCollapsedView) {
+//            final boolean underCollapsedView = ViewUtil.isTouchPointInView(mCollapsedView, (int) rawX, (int) rawY);
+            final View childOfCollapsedUnderTouch = ViewUtil.findChildUnderThis(mCollapsedView, (int) rawX, (int) rawY);
+            if (underDragSlop && (childOfCollapsedUnderTouch != null)) {
                 if (Logger.isTagEnabled("touch")) {
                     Logger.d("touch", "非滑动,且在 collapsed view 范围内");
                 }

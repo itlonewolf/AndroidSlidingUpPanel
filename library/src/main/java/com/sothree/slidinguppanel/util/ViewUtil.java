@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.ViewGroup;
 import com.sothree.slidinguppanel.log.Logger;
 
 import java.util.ArrayList;
@@ -55,6 +56,24 @@ public class ViewUtil {
         }
         
         return null;
+    }
+    
+    /**
+     * 查找 rawX 与 rawY 点中的 parent 中的子 view;如果 parent 是 view ,那么直接返回
+     */
+    public static View findChildUnderThis(View parent, int rawX, int rawY) {
+        if (parent instanceof ViewGroup) {
+            ViewGroup vgParent   = (ViewGroup) parent;
+            final int childCount = vgParent.getChildCount();
+            for (int index = 0; index < childCount; index++) {
+                View childView = vgParent.getChildAt(index);
+                if (isTouchPointInView(childView, rawX, rawY)) {
+                    return childView;
+                }
+            }
+            return null;
+        }
+        return parent;
     }
     
     /**
