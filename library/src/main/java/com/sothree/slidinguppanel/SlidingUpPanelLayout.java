@@ -230,9 +230,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private float mInitialMotionX;
     private float mInitialMotionY;
     
-    private float mInitialXInDispatch;
-    private float mInitialYInDispatch;
-    
     private boolean mIsScrollableViewHandlingTouch = false;
 
     private final List<PanelSlideListener> mPanelSlideListeners = new CopyOnWriteArrayList<>();
@@ -1088,8 +1085,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
         final float y    = ev.getY();
         final float rawX = ev.getRawX();
         final float rawY = ev.getRawY();
-        final float adx  = Math.abs(x - mInitialXInDispatch);
-        final float ady  = Math.abs(y - mInitialYInDispatch);
+        final float adx  = Math.abs(x - mInitialMotionX);
+        final float ady  = Math.abs(y - mInitialMotionY);
     
         if (Logger.isTagEnabled("touch")) {
             Logger.d("touch", "called onTouchEvent");
@@ -1141,8 +1138,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
         final float x    = ev.getX();
         final float y    = ev.getY();
-        final float adx  = Math.abs(x - mInitialXInDispatch);
-        final float ady  = Math.abs(y - mInitialYInDispatch);
+        final float adx  = Math.abs(x - mInitialMotionX);
+        final float ady  = Math.abs(y - mInitialMotionY);
         final float rawX = ev.getRawX();
         final float rawY = ev.getRawY();
 
@@ -1150,8 +1147,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (Logger.isTagEnabled("drag")) {
                 Logger.d("drag", "dispatchTouchEvent down");
             }
-            mInitialXInDispatch = x;
-            mInitialYInDispatch = y;
             
             mIsScrollableViewHandlingTouch = false;
             mPrevMotionY = y;
