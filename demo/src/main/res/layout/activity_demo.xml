@@ -11,7 +11,7 @@
         sothree:umanoOverlay="true"
         sothree:umanoScrollableView="@+id/list"
         sothree:umanoCollapsedView="@+id/collapsed_view"
-
+        sothree:umanoExpandedStateTop="60dp"
         sothree:umanoMainView="@+id/main_view"
         sothree:umanoSlideableView="@+id/sliding_view"
 >

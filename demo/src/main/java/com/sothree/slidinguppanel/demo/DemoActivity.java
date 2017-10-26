@@ -138,6 +138,10 @@ public class DemoActivity extends ActionBarActivity {
             }
         });
     }
+    
+    public void btnFloat(View view) {
+        Toast.makeText(getApplicationContext(), "btnFloat", Toast.LENGTH_SHORT).show();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
