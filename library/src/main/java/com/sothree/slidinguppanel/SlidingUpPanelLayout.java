@@ -159,6 +159,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * If provided, the panel will transfer the scroll from this view to itself when needed.
+     * 可以自己滚动(且想让其滚动)的子 view;比如 listview、scrollview 等
      */
     private View mScrollableView;
     private int mScrollableViewResId;
@@ -427,7 +428,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     
         if (mCollapsedViewResId != -1) {
-            mCollapsedView = findViewById(mCollapsedViewResId);
+            setCollapsedView(findViewById(mCollapsedViewResId));
         }
     
         if (mMainViewResId != -1) {
@@ -654,6 +655,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     public void setScrollableView(View scrollableView) {
         mScrollableView = scrollableView;
+    }
+    
+    public void setCollapsedView(View collapsedView) {
+        this.mCollapsedView = collapsedView;
     }
 
     /**
