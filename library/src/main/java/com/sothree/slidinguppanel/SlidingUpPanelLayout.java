@@ -113,6 +113,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     private int mCollapsedPanelHeight = -1;
     
+    private int mCustomPanelHeight = -1;
+    
     /**
      * 扩展状态下,与上边缘的距离
      */
@@ -500,11 +502,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * @param val A height in pixels
      */
     public void setPanelHeight(int val) {
-        if (getPanelHeight() == val) {
-            return;
-        }
-    
-        mCollapsedPanelHeight = val;
+//        if (getPanelHeight() == val) {
+//            return;
+//        }
+
+//        mCollapsedPanelHeight = val;
+        mCustomPanelHeight = val;
         if (!mFirstLayout) {
             requestLayout();
         }
@@ -909,9 +912,16 @@ public class SlidingUpPanelLayout extends ViewGroup {
         mSlideRange = mSlideableView.getMeasuredHeight() - mCollapsedPanelHeight;
         updatePanelAboutTop();
     
-        if (mCollapsedView != null) {
+    
+        //idea 优先使用自定义的高度
+        if (mCustomPanelHeight != -1) {
+            mCollapsedPanelHeight = mCustomPanelHeight;
+        } else if (mCollapsedView != null) {
+            //idea 如果未自定义高度,且指定了 collapsed view ,那么使用 collapsed view 的高度
             mCollapsedPanelHeight = mCollapsedView.getMeasuredHeight();
         }
+        //idea 否则使用默认的(默认值在初始化中就赋值了)
+        
         final int paddingLeft = getPaddingLeft();
         final int paddingTop = getPaddingTop();
 
