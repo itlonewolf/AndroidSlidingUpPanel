@@ -1,38 +1,62 @@
 package com.sothree.slidinguppanel.demo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
+import android.view.*;
 import android.view.View.OnClickListener;
 import android.widget.*;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class DemoActivity extends ActionBarActivity {
+public class DemoActivity extends AppCompatActivity {
     private static final String TAG = "DemoActivity";
     
     private SlidingUpPanelLayout mLayout;
     private Button               btnInCollapsed;
-
+    
+    
+    private RecyclerView mRecyclerView;
+    private GalleryAdapter mAdapter;
+    private List<Integer> mDatas;
+    
 //    private View leadingView;
 
 //    private View viewWaiting2Show;
-
+    
+    private void initDatas() {
+        mDatas = new ArrayList<>(Arrays.asList(R.drawable.ic_launcher,
+                                               R.drawable.ic_launcher, R.drawable.ic_launcher, R.drawable.ic_launcher, R.drawable.ic_launcher,
+                                               R.drawable.ic_launcher, R.drawable.ic_launcher, R.drawable.ic_launcher, R.drawable.ic_launcher
+                                              ));
+    }
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_demo);
-
-//        setSupportActionBar((Toolbar) findViewById(R.id.main_toolbar));
+    
+        setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar));
+    
+        initDatas();
+        mRecyclerView = (RecyclerView) findViewById(R.id.id_recyclerview_horizontal);
+        //设置布局管理器
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+        mRecyclerView.setLayoutManager(linearLayoutManager);
+        //设置适配器
+        mAdapter = new GalleryAdapter(this, mDatas);
+        mRecyclerView.setAdapter(mAdapter);
 
         ListView lv = (ListView) findViewById(R.id.list);
         lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -141,6 +165,54 @@ public class DemoActivity extends ActionBarActivity {
     
     public void btnFloat(View view) {
         Toast.makeText(getApplicationContext(), "btnFloat", Toast.LENGTH_SHORT).show();
+    }
+    
+    public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
+        private LayoutInflater mInflater;
+        private List<Integer>  mDatas;
+        
+        public GalleryAdapter(Context context, List<Integer> datats) {
+            mInflater = LayoutInflater.from(context);
+            mDatas = datats;
+        }
+        
+        public class ViewHolder extends RecyclerView.ViewHolder {
+            public ViewHolder(View arg0) {
+                super(arg0);
+            }
+            
+            ImageView mImg;
+            TextView  mTxt;
+        }
+        
+        @Override
+        public int getItemCount() {
+            return mDatas.size();
+        }
+        
+        /**
+         * 创建ViewHolder
+         */
+        @Override
+        public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+            View view = mInflater.inflate(R.layout.ry_item_layout,
+                                          viewGroup, false
+                                         );
+            ViewHolder viewHolder = new ViewHolder(view);
+            
+            viewHolder.mImg = (ImageView) view
+                    .findViewById(R.id.id_index_gallery_item_image);
+            return viewHolder;
+        }
+        
+        /**
+         * 设置值
+         */
+        @Override
+        public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
+            viewHolder.mImg.setImageResource(mDatas.get(i));
+        }
+        
     }
 
     @Override

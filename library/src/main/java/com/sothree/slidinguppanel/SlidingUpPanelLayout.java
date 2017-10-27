@@ -180,6 +180,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
     private View mMainView;
     private int  mMainViewResId;
     
+    private View mParallaxView;
+    private int  mParallaxViewResId;
+    
     private int mPanleCollapsedTop = -1;
     private int mPanleExpandedTop  = -1;
     private int mPanleAnchorTop    = -1;
@@ -368,6 +371,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mCollapsedViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoCollapsedView, -1);
                 mSlideableViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoSlideableView, -1);
                 mMainViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoMainView, -1);
+                mParallaxViewResId = ta.getResourceId(R.styleable.SlidingUpPanelLayout_umanoParallaxView, -1);
 
                 mOverlayContent = ta.getBoolean(R.styleable.SlidingUpPanelLayout_umanoOverlay, DEFAULT_OVERLAY_FLAG);
                 mClipPanel = ta.getBoolean(R.styleable.SlidingUpPanelLayout_umanoClipPanel, DEFAULT_CLIP_PANEL_FLAG);
@@ -429,6 +433,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
         if (mCollapsedViewResId != -1) {
             setCollapsedView(findViewById(mCollapsedViewResId));
+        }
+    
+        if (mParallaxViewResId != -1) {
+            mParallaxView = findViewById(mParallaxViewResId);
         }
     
         if (mMainViewResId != -1) {
@@ -1414,12 +1422,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * Update the parallax based on the current slide offset.
      */
-    @SuppressLint("NewApi")
     private void applyParallaxForCurrentSlideOffset() {
-        if (mMainView != null) {
+        if (mParallaxView != null) {
             if (mParallaxOffset > 0) {
                 int mainViewOffset = getCurrentParallaxOffset();
-                ViewCompat.setTranslationY(mMainView, mainViewOffset);
+                ViewCompat.setTranslationY(mParallaxView, mainViewOffset);
             }
         }
     }

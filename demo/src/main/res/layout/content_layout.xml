@@ -40,6 +40,13 @@
                 android:layout_height="0dp"
                 android:layout_weight="1">
         </ListView>
+        <android.support.v7.widget.RecyclerView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:id="@+id/id_recyclerview_horizontal"
+        >
+
+        </android.support.v7.widget.RecyclerView>
         <!--<ScrollView-->
         <!--android:id="@+id/sv"-->
         <!--android:layout_width="match_parent"-->
@@ -79,18 +86,5 @@
                 android:layout_gravity="center"
         />
     </LinearLayout>
-
-    <Button
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="@string/action_anchor_disable"
-            android:background="#ffff0000"
-            android:textSize="25sp"
-            android:gravity="center"
-            android:layout_gravity="bottom"
-            android:onClick="btnFloat"
-
-    />
-
 
 </merge>
