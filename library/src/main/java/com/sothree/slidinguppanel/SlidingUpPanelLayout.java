@@ -930,8 +930,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     
         mSlideRange = mSlideableView.getMeasuredHeight() - mCollapsedPanelHeight;
-        updatePanelAboutTop();
-    
     
         //idea 优先使用自定义的高度
         if (mCustomPanelHeight != -1) {
@@ -1000,11 +998,19 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             child.layout(childLeft, childTop, childRight, childBottom);
         }
-
+    
+        //idea 此步一定要在子 view 都 layout 完成之后再计算,否则可能出现计算异常的情况
+        updatePanelAboutTop();
         if (mFirstLayout) {
             updateObscuredViewVisibility();
         }
         applyParallaxForCurrentSlideOffset();
+    
+        if (mCollapsedView != null) {
+            if (mSlideableView.getTop() != mPanleCollapsedTop) {
+                collapsedViewGone();
+            }
+        }
 
         mFirstLayout = false;
     }
@@ -1688,7 +1694,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (changedView.getId() == mSlideableViewResId) {
                 if (top == mPanleCollapsedTop) {
                     if (Logger.isTagEnabled("change")) {
-                        Logger.d("change", "mPanleCollapsedTop: %s, top: %s", mPanleCollapsedTop, top);
+                        Logger.d("change", "mPanleCollapsedTop:%s, top:%s, calc top:%s", mPanleCollapsedTop, top, computePanelTopPosition(0));
                     }
         
                     resetCollapsedView();

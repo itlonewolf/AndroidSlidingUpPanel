@@ -28,6 +28,10 @@
 	{
 	  "tag": "touch",
 	  "isEnable": true
+	},
+	{
+	  "tag": "change",
+	  "isEnable": true
 	}
   ]
 }
