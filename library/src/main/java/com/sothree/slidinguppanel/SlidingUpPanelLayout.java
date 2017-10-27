@@ -347,7 +347,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             TypedArray defAttrs = context.obtainStyledAttributes(attrs, DEFAULT_ATTRS);
 
             if (defAttrs != null) {
-                int gravity = defAttrs.getInt(0, Gravity.NO_GRAVITY);
+                int gravity = defAttrs.getInt(0, Gravity.BOTTOM);
                 setGravity(gravity);
                 defAttrs.recycle();
             }
