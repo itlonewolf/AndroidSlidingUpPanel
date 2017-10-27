@@ -1196,8 +1196,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     if (Logger.isTagEnabled("drag")) {
                         Logger.d("drag", "dispatchTouchEvent move collapsed view");
                     }
-                    collapsedViewGone();
-    
                 }
             }
     
@@ -1367,10 +1365,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (Logger.isTagEnabled("drag")) {
             Logger.d("drag", "想设置当前 panel state 为: %s", state);
         }
-    
-        if (PanelState.COLLAPSED != state) {
-            collapsedViewGone();
-        }
         
         if (mFirstLayout) {
             setPanelStateInternal(state);
@@ -1401,9 +1395,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
     private void collapsedViewGone() {
         if (mCollapsedView != null) {
-            mCollapsedView.setVisibility(GONE);
-            if (mVisibilityChangeListener != null) {
-                mVisibilityChangeListener.onVisibilityChange(GONE);
+            if (View.GONE != mCollapsedView.getVisibility()) {
+                mCollapsedView.setVisibility(GONE);
+                if (mVisibilityChangeListener != null) {
+                    mVisibilityChangeListener.onVisibilityChange(GONE);
+                }
             }
         }
         isCollapsedGone = true;
@@ -1411,9 +1407,11 @@ public class SlidingUpPanelLayout extends ViewGroup {
     
     private void resetCollapsedView() {
         if (mCollapsedView != null) {
-            mCollapsedView.setVisibility(VISIBLE);
-            if (mVisibilityChangeListener != null) {
-                mVisibilityChangeListener.onVisibilityChange(VISIBLE);
+            if (View.VISIBLE != mCollapsedView.getVisibility()) {
+                mCollapsedView.setVisibility(VISIBLE);
+                if (mVisibilityChangeListener != null) {
+                    mVisibilityChangeListener.onVisibilityChange(VISIBLE);
+                }
             }
         }
         isCollapsedGone = false;
@@ -1474,8 +1472,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
         boolean result;
     
         @SuppressLint("WrongConstant") final int save = canvas.save(Canvas.CLIP_SAVE_FLAG);
-
-        if (mSlideableView != null && mSlideableView != child) { // if main view
+    
+        if (child == mMainView) { // if main view
             // Clip against the slider; no sense drawing what will immediately be covered,
             // Unless the panel is set to overlay content
             canvas.getClipBounds(mTmpRect);
@@ -1689,7 +1687,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
         
             if (changedView.getId() == mSlideableViewResId) {
                 if (top == mPanleCollapsedTop) {
+                    if (Logger.isTagEnabled("change")) {
+                        Logger.d("change", "mPanleCollapsedTop: %s, top: %s", mPanleCollapsedTop, top);
+                    }
+        
                     resetCollapsedView();
+                } else {
+                    collapsedViewGone();
                 }
                 if (Logger.isTagEnabled("drag")) {
                     Logger.d("drag", "Slideable view dragging top:%s", top);
