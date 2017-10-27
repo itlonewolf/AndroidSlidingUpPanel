@@ -436,7 +436,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
         }
     
         if (mParallaxViewResId != -1) {
-            mParallaxView = findViewById(mParallaxViewResId);
+            setTopParallaxView(findViewById(mParallaxViewResId));
         }
     
         if (mMainViewResId != -1) {
@@ -643,6 +643,13 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mDragView.setFocusableInTouchMode(false);
             mDragView.setOnClickListener(mOnDragViewClickListener);
         }
+    }
+    
+    /**
+     * 设置顶部想实现视差效果的 view,此 view 必须在 main content 中
+     */
+    public void setTopParallaxView(View parallaxView) {
+        this.mParallaxView = parallaxView;
     }
 
     /**

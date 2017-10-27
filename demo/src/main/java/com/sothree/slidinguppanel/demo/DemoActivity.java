@@ -11,7 +11,10 @@ import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.*;
 import android.view.View.OnClickListener;
-import android.widget.*;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
@@ -58,50 +61,50 @@ public class DemoActivity extends AppCompatActivity {
         mAdapter = new GalleryAdapter(this, mDatas);
         mRecyclerView.setAdapter(mAdapter);
 
-        ListView lv = (ListView) findViewById(R.id.list);
-        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(DemoActivity.this, "onItemClick", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        List<String> your_array_list = Arrays.asList(
-                "This",
-                "Is",
-                "An",
-                "Example",
-                "ListView",
-                "That",
-                "You",
-                "Can",
-                "Scroll",
-                ".",
-                "It",
-                "Shows",
-                "How",
-                "Any",
-                "Scrollable",
-                "View",
-                "Can",
-                "Be",
-                "Included",
-                "As",
-                "A",
-                "Child",
-                "Of",
-                "SlidingUpPanelLayout"
-        );
-
-        // This is the array adapter, it takes the context of the activity as a
-        // first parameter, the type of list view as a second parameter and your
-        // array as a third parameter.
-        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
-                this,
-                android.R.layout.simple_list_item_1,
-                your_array_list );
-
-        lv.setAdapter(arrayAdapter);
+//        ListView lv = (ListView) findViewById(R.id.list);
+//        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Toast.makeText(DemoActivity.this, "onItemClick", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//        List<String> your_array_list = Arrays.asList(
+//                "This",
+//                "Is",
+//                "An",
+//                "Example",
+//                "ListView",
+//                "That",
+//                "You",
+//                "Can",
+//                "Scroll",
+//                ".",
+//                "It",
+//                "Shows",
+//                "How",
+//                "Any",
+//                "Scrollable",
+//                "View",
+//                "Can",
+//                "Be",
+//                "Included",
+//                "As",
+//                "A",
+//                "Child",
+//                "Of",
+//                "SlidingUpPanelLayout"
+//        );
+//
+//        // This is the array adapter, it takes the context of the activity as a
+//        // first parameter, the type of list view as a second parameter and your
+//        // array as a third parameter.
+//        ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(
+//                this,
+//                android.R.layout.simple_list_item_1,
+//                your_array_list );
+//
+//        lv.setAdapter(arrayAdapter);
 
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
         btnInCollapsed = (Button) findViewById(R.id.btnInCollapsed);

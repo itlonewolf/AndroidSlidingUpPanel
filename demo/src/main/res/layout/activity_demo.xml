@@ -4,17 +4,16 @@
         android:id="@+id/sliding_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:gravity="bottom"
         sothree:umanoPanelHeight="68dp"
         sothree:umanoShadowHeight="4dp"
         sothree:umanoParallaxOffset="200dp"
         sothree:umanoOverlay="true"
         sothree:umanoExpandedStateTop="60dp"
 
-        sothree:umanoScrollableView="@+id/list"
+        sothree:umanoScrollableView="@+id/sv"
         sothree:umanoCollapsedView="@+id/collapsed_view"
 
-        sothree:umanoParallaxView="@+id/main_view"
+        sothree:umanoParallaxView="@+id/main_toolbar"
         sothree:umanoMainView="@+id/main_view"
         sothree:umanoSlideableView="@+id/sliding_view"
 >
