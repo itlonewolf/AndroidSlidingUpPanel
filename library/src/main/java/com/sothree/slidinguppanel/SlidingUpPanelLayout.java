@@ -96,7 +96,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * Default parallax length of the main view
      */
-    private static final int DEFAULT_PARALLAX_OFFSET = 0;
+    private static final int DEFAULT_PARALLAX_OFFSET = 100;
 
     /**
      * The paint used to dim the main layout when sliding
@@ -992,9 +992,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     childTop = computePanelTopPosition(mSlideOffset) + mSlideableView.getMeasuredHeight();
                 }
             }
+    
             final int childBottom = childTop + childHeight;
-            final int childLeft = paddingLeft + lp.leftMargin;
-            final int childRight = childLeft + child.getMeasuredWidth();
+            final int childLeft   = paddingLeft + lp.leftMargin;
+            final int childRight  = childLeft + child.getMeasuredWidth();
 
             child.layout(childLeft, childTop, childRight, childBottom);
         }
@@ -1618,6 +1619,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     @Override
     public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
+        if (Logger.isTagEnabled("attribute")) {
+            Logger.d("attribute", "attrs: %s", attrs);
+        }
+        
         return new LayoutParams(getContext(), attrs);
     }
 

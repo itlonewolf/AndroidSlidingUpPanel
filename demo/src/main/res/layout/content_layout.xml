@@ -8,6 +8,7 @@
             android:orientation="vertical"
             android:visibility="visible"
             android:id="@+id/sliding_view"
+            android:clickable="true"
     >
         <LinearLayout
                 android:layout_width="match_parent"

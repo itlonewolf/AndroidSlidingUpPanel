@@ -32,6 +32,10 @@
 	{
 	  "tag": "change",
 	  "isEnable": true
+	},
+	{
+	  "tag": "attribute",
+	  "isEnable": true
 	}
   ]
 }

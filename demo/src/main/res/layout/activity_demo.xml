@@ -6,9 +6,9 @@
         android:layout_height="match_parent"
         sothree:umanoPanelHeight="68dp"
         sothree:umanoShadowHeight="4dp"
-        sothree:umanoParallaxOffset="200dp"
+
         sothree:umanoExpandedStateTop="60dp"
-        sothree:umanoScrollableView="@+id/sv"
+        sothree:umanoScrollableView="@+id/list"
         sothree:umanoCollapsedView="@+id/collapsed_view"
 
         sothree:umanoParallaxView="@+id/main_toolbar"

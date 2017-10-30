@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -51,15 +50,17 @@ public class DemoActivity extends AppCompatActivity {
     
         setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar));
     
-        initDatas();
-        mRecyclerView = (RecyclerView) findViewById(R.id.id_recyclerview_horizontal);
+        //case ▼ recyclerview 相关初始化 xiaoyee ▼
+//        initDatas();
+//        mRecyclerView = (RecyclerView) findViewById(R.id.id_recyclerview_horizontal);
         //设置布局管理器
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        mRecyclerView.setLayoutManager(linearLayoutManager);
-        //设置适配器
-        mAdapter = new GalleryAdapter(this, mDatas);
-        mRecyclerView.setAdapter(mAdapter);
+//        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
+//        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+//        mRecyclerView.setLayoutManager(linearLayoutManager);
+//        //设置适配器
+//        mAdapter = new GalleryAdapter(this, mDatas);
+//        mRecyclerView.setAdapter(mAdapter);
+        //case ▲ recyclerview 相关初始化 xiaoyee ▲
 
 //        ListView lv = (ListView) findViewById(R.id.list);
 //        lv.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -111,7 +112,8 @@ public class DemoActivity extends AppCompatActivity {
         btnInCollapsed.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getApplicationContext(), "btnInCollapsed", Toast.LENGTH_SHORT).show();
+                startActivity(new Intent(DemoActivity.this, ConstraintActivity.class));
+//                Toast.makeText(getApplicationContext(), "btnInCollapsed", Toast.LENGTH_SHORT).show();
 //                mLayout.demoListener();
             }
         });
