@@ -1181,6 +1181,12 @@ public class SlidingUpPanelLayout extends ViewGroup {
         final float ady  = Math.abs(y - mInitialMotionY);
         final float rawX = ev.getRawX();
         final float rawY = ev.getRawY();
+    
+        //idea 如果未设置 main view ,且触摸点不在 slideable view 中,那么不做任何处理
+        if (mMainView == null && !ViewUtil.isTouchPointInView(mSlideableView, (int) rawX, (int) rawY)) {
+        
+            return false;
+        }
 
         if (action == MotionEvent.ACTION_DOWN) {
             if (Logger.isTagEnabled("drag")) {

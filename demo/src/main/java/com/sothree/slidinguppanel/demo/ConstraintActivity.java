@@ -9,6 +9,7 @@ import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class ConstraintActivity extends AppCompatActivity {
     
@@ -32,5 +33,9 @@ public class ConstraintActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+    }
+    
+    public void underBtn(View view) {
+        Toast.makeText(getBaseContext(), "underBtn", Toast.LENGTH_SHORT).show();
     }
 }
