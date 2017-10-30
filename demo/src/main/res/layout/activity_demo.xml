@@ -8,7 +8,7 @@
         sothree:umanoShadowHeight="4dp"
 
         sothree:umanoExpandedStateTop="60dp"
-        sothree:umanoScrollableView="@+id/list"
+        sothree:umanoScrollableView="@+id/sv"
         sothree:umanoCollapsedView="@+id/collapsed_view"
 
         sothree:umanoParallaxView="@+id/main_toolbar"

@@ -301,7 +301,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
          * @param panel       The child view that was moved
          * @param slideOffset The new offset of this sliding pane within its range, from 0-1
          */
-        void onPanelSlide(View panel, float slideOffset);
+        void onPanelSlide(View panel, float slideOffset, float slideRange);
 
         /**
          * Called when a sliding panel state changes
@@ -317,7 +317,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     public static class SimplePanelSlideListener implements PanelSlideListener {
         @Override
-        public void onPanelSlide(View panel, float slideOffset) {
+        public void onPanelSlide(View panel, float slideOffset, float slideRange) {
         }
 
         @Override
@@ -744,7 +744,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
     void dispatchOnPanelSlide(View panel) {
         synchronized (mPanelSlideListeners) {
             for (PanelSlideListener l : mPanelSlideListeners) {
-                l.onPanelSlide(panel, mSlideOffset);
+                l.onPanelSlide(panel, mSlideOffset, mSlideRange);
             }
         }
     }
@@ -1032,6 +1032,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             mDragHelper.abort();
             return false;
         }
+    
+        if (Logger.isTagEnabled("touch")) {
+            Logger.d("touch", "onInterceptTouchEvent");
+        }
 
         final int   action = MotionEventCompat.getActionMasked(ev);
         final float x      = ev.getX();
@@ -1049,6 +1053,18 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mIsUnableToDrag = false;
                 mInitialMotionX = x;
                 mInitialMotionY = y;
+
+//                //idea 如果未设置 main view ,且触摸点不在 slideable view 中,那么不做任何处理
+//                if (mMainView == null && !ViewUtil.isTouchPointInView(mSlideableView, (int) rawX, (int) rawY)) {
+//                    if (Logger.isTagEnabled("drag")) {
+//                        Logger.d("drag", "未设置 main view,且触摸点不在 slideable view 中");
+//                    }
+//
+//                    mDragHelper.cancel();
+//                    mIsUnableToDrag = true;
+//                    return false;
+//                }
+                
                 if (!isViewUnder(mDragView, (int) x, (int) y)) {
                     if (Logger.isTagEnabled("drag")) {
                         Logger.d("drag", "触摸点不在 drag view 范围内");
@@ -1118,6 +1134,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return super.onTouchEvent(ev);
         }
     
+        if (Logger.isTagEnabled("touch")) {
+            Logger.d("touch", "onTouchEvent");
+        }
+    
         final float x    = ev.getX();
         final float y    = ev.getY();
         final float rawX = ev.getRawX();
@@ -1175,6 +1195,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
             return super.dispatchTouchEvent(ev);
         }
     
+        if (Logger.isTagEnabled("touch")) {
+            Logger.d("touch", "dispatchTouchEvent");
+        }
+    
         final float x    = ev.getX();
         final float y    = ev.getY();
         final float adx  = Math.abs(x - mInitialMotionX);
@@ -1183,8 +1207,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
         final float rawY = ev.getRawY();
     
         //idea 如果未设置 main view ,且触摸点不在 slideable view 中,那么不做任何处理
-        if (mMainView == null && !ViewUtil.isTouchPointInView(mSlideableView, (int) rawX, (int) rawY)) {
-        
+        if (!mDragHelper.isDragging() && mMainView == null && !ViewUtil.isTouchPointInView(mSlideableView, (int) rawX, (int) rawY)) {
+            if (Logger.isTagEnabled("touch")) {
+                Logger.d("touch", "未设置 main view ,且触摸点不在 slideable view 中");
+            }
             return false;
         }
 

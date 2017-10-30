@@ -3,6 +3,8 @@ package com.sothree.slidinguppanel.demo;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.Guideline;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -10,15 +12,29 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.sothree.slidinguppanel.log.Logger;
 
 public class ConstraintActivity extends AppCompatActivity {
+    
+    View                 mView;
+    SlidingUpPanelLayout mPanelLayout;
+    
+    View mParent;
+    
+    //    private int marginBottomInit;
+    private int base_bottom;
+    ConstraintLayout.LayoutParams mBaselineParams;
+    
+    Guideline mGuideline;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_constraint);
         setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar));
-        
+    
+        mParent = findViewById(R.id.container_constraint);
         
         TextView t = (TextView) findViewById(R.id.name);
         t.setText(Html.fromHtml(getString(R.string.hello)));
@@ -33,6 +49,38 @@ public class ConstraintActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+    
+        mGuideline = (Guideline) findViewById(R.id.base_line);
+        mBaselineParams = (ConstraintLayout.LayoutParams) mGuideline.getLayoutParams();
+        if (Logger.isTagEnabled("drag")) {
+            Logger.d("drag", "guide line 的初始值为: %s", base_bottom);
+        }
+    
+        base_bottom = mBaselineParams.guideEnd;
+//        mGuideline.set
+
+
+//        mView = findViewById(R.id.layout_under_slide);
+//        mParams = (ConstraintLayout.LayoutParams) mView.getLayoutParams();
+//        marginBottomInit = mParams.bottomMargin;
+    
+        mPanelLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+    
+        mPanelLayout.addPanelSlideListener(new SlidingUpPanelLayout.SimplePanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset, float slideRange) {
+            
+                final int slideDis = (int) (slideOffset * slideRange);
+                if (Logger.isTagEnabled("slide")) {
+                    Logger.d("slide", "滑动的距离为: %s", slideDis);
+                }
+            
+                mBaselineParams.guideEnd = base_bottom + slideDis;
+                mGuideline.setLayoutParams(mBaselineParams);
+            
+            }
+        });
+        
     }
     
     public void underBtn(View view) {

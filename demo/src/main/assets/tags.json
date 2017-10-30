@@ -36,6 +36,10 @@
 	{
 	  "tag": "attribute",
 	  "isEnable": true
+	},
+	{
+	  "tag": "slide",
+	  "isEnable": true
 	}
   ]
 }
