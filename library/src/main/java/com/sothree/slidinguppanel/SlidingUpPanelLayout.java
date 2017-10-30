@@ -1369,7 +1369,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     private float computeSlideOffset(int topPosition) {
         // Compute the panel top position if the panel is collapsed (offset 0)
-        final int topBoundCollapsed = computePanelTopPosition(0);
+        final int topBoundCollapsed = mPanleCollapsedTop;
+//        final int topBoundCollapsed = computePanelTopPosition(0);
 
         // Determine the new slide offset based on the collapsed top position and the new required
         // top position
@@ -1423,7 +1424,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     smoothSlideTo(1.0f, 0);
                     break;
                 case HIDDEN:
-                    int newTop = computePanelTopPosition(0.0f) + (mIsSlidingUp ? +mCollapsedPanelHeight : -mCollapsedPanelHeight);
+                    int newTop = mPanleCollapsedTop + (mIsSlidingUp ? +mCollapsedPanelHeight : -mCollapsedPanelHeight);
+//                    int newTop = computePanelTopPosition(0.0f) + (mIsSlidingUp ? +mCollapsedPanelHeight : -mCollapsedPanelHeight);
                     smoothSlideTo(computeSlideOffset(newTop), 0);
                     break;
             }
@@ -1731,7 +1733,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             if (changedView.getId() == mSlideableViewResId) {
                 if (top == mPanleCollapsedTop) {
                     if (Logger.isTagEnabled("change")) {
-                        Logger.d("change", "mPanleCollapsedTop:%s, top:%s, calc top:%s", mPanleCollapsedTop, top, computePanelTopPosition(0));
+                        Logger.d("change", "mPanleCollapsedTop:%s, top:%s, calc top:%s", mPanleCollapsedTop, top, mPanleCollapsedTop);
                     }
         
                     resetCollapsedView();
@@ -1756,25 +1758,32 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
             if (direction > 0 && mSlideOffset <= mAnchorPoint) {
                 // swipe up -> expand and stop at anchor point
-                target = computePanelTopPosition(mAnchorPoint);
+                target = mPanleAnchorTop;
+//                target = computePanelTopPosition(mAnchorPoint);
             } else if (direction > 0 && mSlideOffset > mAnchorPoint) {
                 // swipe up past anchor -> expand
-                target = computePanelTopPosition(1.0f);
+                target = mExpandedStateTop;
+//                target = computePanelTopPosition(1.0f);
             } else if (direction < 0 && mSlideOffset >= mAnchorPoint) {
                 // swipe down -> collapse and stop at anchor point
-                target = computePanelTopPosition(mAnchorPoint);
+                target = mPanleAnchorTop;
+//                target = computePanelTopPosition(mAnchorPoint);
             } else if (direction < 0 && mSlideOffset < mAnchorPoint) {
                 // swipe down past anchor -> collapse
-                target = computePanelTopPosition(0.0f);
+                target = mPanleCollapsedTop;
+//                target = computePanelTopPosition(0.0f);
             } else if (mSlideOffset >= (1.f + mAnchorPoint) / 2) {
                 // zero velocity, and far enough from anchor point => expand to the top
-                target = computePanelTopPosition(1.0f);
+                target = mExpandedStateTop;
+//                target = computePanelTopPosition(1.0f);
             } else if (mSlideOffset >= mAnchorPoint / 2) {
                 // zero velocity, and close enough to anchor point => go to anchor
-                target = computePanelTopPosition(mAnchorPoint);
+                target = mPanleAnchorTop;
+//                target = computePanelTopPosition(mAnchorPoint);
             } else {
                 // settle at the bottom
-                target = computePanelTopPosition(0.0f);
+                target = mPanleCollapsedTop;
+//                target = computePanelTopPosition(0.0f);
             }
 
             if (mDragHelper != null) {
@@ -1790,8 +1799,10 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
         @Override
         public int clampViewPositionVertical(View child, int top, int dy) {
-            final int collapsedTop = computePanelTopPosition(0.f);
-            final int expandedTop = computePanelTopPosition(1.0f);
+            final int collapsedTop = mPanleCollapsedTop;
+//            final int collapsedTop = computePanelTopPosition(0.f);
+            final int expandedTop = mExpandedStateTop;
+//            final int expandedTop = computePanelTopPosition(1.0f);
             if (mIsSlidingUp) {
                 return Math.min(Math.max(top, expandedTop), collapsedTop);
             } else {
