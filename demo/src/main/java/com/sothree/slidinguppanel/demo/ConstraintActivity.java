@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +19,7 @@ import com.sothree.slidinguppanel.log.Logger;
 public class ConstraintActivity extends AppCompatActivity {
     
     View                 mView;
+    View                 mbtn_navi;
     SlidingUpPanelLayout mPanelLayout;
     
     View mParent;
@@ -35,6 +37,13 @@ public class ConstraintActivity extends AppCompatActivity {
         setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar));
     
         mParent = findViewById(R.id.container_constraint);
+    
+        mParent.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+            
+            }
+        });
         
         TextView t = (TextView) findViewById(R.id.name);
         t.setText(Html.fromHtml(getString(R.string.hello)));
@@ -49,6 +58,9 @@ public class ConstraintActivity extends AppCompatActivity {
                 startActivity(i);
             }
         });
+    
+        mView = findViewById(R.id.layout_under_slide);
+        mbtn_navi = findViewById(R.id.btn_navi);
     
         mGuideline = (Guideline) findViewById(R.id.base_line);
         mBaselineParams = (ConstraintLayout.LayoutParams) mGuideline.getLayoutParams();
@@ -74,9 +86,15 @@ public class ConstraintActivity extends AppCompatActivity {
                 if (Logger.isTagEnabled("slide")) {
                     Logger.d("slide", "滑动的距离为: %s", slideDis);
                 }
-            
-                mBaselineParams.guideEnd = base_bottom + slideDis;
-                mGuideline.setLayoutParams(mBaselineParams);
+
+//                mBaselineParams.guideEnd = base_bottom + slideDis;
+//                mGuideline.setLayoutParams(mBaselineParams);
+//                ViewCompat.postInvalidateOnAnimation(mGuideline);
+    
+                mbtn_navi.setTranslationY(-slideDis);
+                mView.setTranslationY(-slideDis);
+//                ViewCompat.postInvalidateOnAnimation(mbtn_navi);
+//                ViewCompat.postInvalidateOnAnimation(mView);
             
             }
         });
