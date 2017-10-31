@@ -511,11 +511,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
      * @param val A height in pixels
      */
     public void setPanelHeight(int val) {
-//        if (getPanelHeight() == val) {
-//            return;
-//        }
-
-//        mCollapsedPanelHeight = val;
         mCustomPanelHeight = val;
         if (!mFirstLayout) {
             requestLayout();
@@ -524,7 +519,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (getPanelState() == PanelState.COLLAPSED) {
             smoothToBottom();
             invalidate();
-            return;
         }
     }
 
@@ -678,8 +672,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Sets the current scrollable view helper. See ScrollableViewHelper description for details.
-     *
-     * @param helper
      */
     public void setScrollableViewHelper(ScrollableViewHelper helper) {
         mScrollableViewHelper = helper;
@@ -710,8 +702,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Sets whether or not the panel overlays the content
-     *
-     * @param overlayed
      */
     public void setOverlayed(boolean overlayed) {
         mOverlayContent = overlayed;
@@ -726,8 +716,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
 
     /**
      * Sets whether or not the main content is clipped to the top of the panel
-     *
-     * @param clip
      */
     public void setClipPanel(boolean clip) {
         mClipPanel = clip;
@@ -824,7 +812,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         if (Logger.isTagEnabled("measure")) {
-            Logger.d("measure", "called onMeasure method");
+//            Logger.d("measure", "called onMeasure method");
+            Logger.d("measure", Logger.OFFSET_ALL_METHOD);
         }
         final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         final int widthSize = MeasureSpec.getSize(widthMeasureSpec);
@@ -847,9 +836,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
         if (mSlideableView.getVisibility() != VISIBLE) {
             mSlideState = PanelState.HIDDEN;
         }
-
+    
         int layoutHeight = heightSize - getPaddingTop() - getPaddingBottom();
-        int layoutWidth = widthSize - getPaddingLeft() - getPaddingRight();
+        int layoutWidth  = widthSize - getPaddingLeft() - getPaddingRight();
 
         // First pass. Measure based on child LayoutParams width/height.
         for (int i = 0; i < childCount; i++) {
@@ -862,7 +851,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
             }
 
             int height = layoutHeight;
-            int width = layoutWidth;
+            int width  = layoutWidth;
             if (child == mMainView) {
                 if (!mOverlayContent && mSlideState != PanelState.HIDDEN) {
                     height -= mCollapsedPanelHeight;
@@ -926,7 +915,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         if (Logger.isTagEnabled("layout")) {
-            Logger.d("layout", "called onLayout method");
+//            Logger.d("layout", "called onLayout method");
+            Logger.d("layout", Logger.OFFSET_ALL_METHOD);
         }
     
         mSlideRange = mSlideableView.getMeasuredHeight() - mCollapsedPanelHeight;
@@ -942,9 +932,9 @@ public class SlidingUpPanelLayout extends ViewGroup {
         
         final int paddingLeft = getPaddingLeft();
         final int paddingTop = getPaddingTop();
-
+    
         final int childCount = getChildCount();
-
+    
         if (mFirstLayout) {
             switch (mSlideState) {
                 case EXPANDED:
@@ -962,7 +952,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                     break;
             }
         }
-
+    
         for (int i = 0; i < childCount; i++) {
             final View child = getChildAt(i);
             final LayoutParams lp = (LayoutParams) child.getLayoutParams();
@@ -1042,8 +1032,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
         final float y      = ev.getY();
         final float adx    = Math.abs(x - mInitialMotionX);
         final float ady    = Math.abs(y - mInitialMotionY);
-        final float rawX   = ev.getRawX();
-        final float rawY   = ev.getRawY();
         
         String actionType = "未知";
 
@@ -1053,17 +1041,6 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 mIsUnableToDrag = false;
                 mInitialMotionX = x;
                 mInitialMotionY = y;
-
-//                //idea 如果未设置 main view ,且触摸点不在 slideable view 中,那么不做任何处理
-//                if (mMainView == null && !ViewUtil.isTouchPointInView(mSlideableView, (int) rawX, (int) rawY)) {
-//                    if (Logger.isTagEnabled("drag")) {
-//                        Logger.d("drag", "未设置 main view,且触摸点不在 slideable view 中");
-//                    }
-//
-//                    mDragHelper.cancel();
-//                    mIsUnableToDrag = true;
-//                    return false;
-//                }
                 
                 if (!isViewUnder(mDragView, (int) x, (int) y)) {
                     if (Logger.isTagEnabled("drag")) {
