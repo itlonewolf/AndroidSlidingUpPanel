@@ -10,7 +10,7 @@ import android.widget.ScrollView;
  * for ListView, ScrollView and RecyclerView, but the library users can override it to add support
  * for other views.
  */
-public class ScrollableViewHelper {
+public class DefaultScrollableViewHelper implements IScrollableViewHelper {
     /**
      * Returns the current scroll position of the scrollable view. If this method returns zero or
      * less, it means at the scrollable view is in a position such as the panel should handle

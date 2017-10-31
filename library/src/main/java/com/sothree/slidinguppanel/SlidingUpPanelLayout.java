@@ -163,7 +163,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
      */
     private View mScrollableView;
     private int mScrollableViewResId;
-    private ScrollableViewHelper mScrollableViewHelper = new ScrollableViewHelper();
+    private IScrollableViewHelper mDefaultScrollableViewHelper = new DefaultScrollableViewHelper();
     
     private View mCollapsedView;
     private int  mCollapsedViewResId;
@@ -673,8 +673,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
     /**
      * Sets the current scrollable view helper. See ScrollableViewHelper description for details.
      */
-    public void setScrollableViewHelper(ScrollableViewHelper helper) {
-        mScrollableViewHelper = helper;
+    public void setScrollableViewHelper(IScrollableViewHelper helper) {
+        mDefaultScrollableViewHelper = helper;
     }
 
     /**
@@ -1229,7 +1229,7 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 //case 正在收起
                 // Is the child less than fully scrolled?
                 // Then let the child handle it.
-                if (mScrollableViewHelper.getScrollableViewScrollPosition(mScrollableView, mIsSlidingUp) > 0) {
+                if (mDefaultScrollableViewHelper.getScrollableViewScrollPosition(mScrollableView, mIsSlidingUp) > 0) {
                     mIsScrollableViewHandlingTouch = true;
                     return super.dispatchTouchEvent(ev);
                 }
