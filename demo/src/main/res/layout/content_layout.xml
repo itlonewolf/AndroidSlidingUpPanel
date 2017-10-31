@@ -31,7 +31,9 @@
                     android:textSize="14sp"
                     android:gravity="center_vertical|right"
                     android:paddingRight="10dp"
-                    android:paddingLeft="10dp"/>
+                    android:paddingLeft="10dp"
+                    android:onClick="btnFloat"
+            />
 
         </LinearLayout>
 

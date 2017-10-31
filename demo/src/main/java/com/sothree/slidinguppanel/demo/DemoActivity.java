@@ -13,7 +13,6 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout.PanelState;
 
@@ -169,7 +168,9 @@ public class DemoActivity extends AppCompatActivity {
     }
     
     public void btnFloat(View view) {
-        Toast.makeText(getApplicationContext(), "btnFloat", Toast.LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "btnFloat", Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(DemoActivity.this, SimpleSlideableActivity.class));
+        
     }
     
     public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
