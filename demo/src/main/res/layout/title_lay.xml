@@ -7,12 +7,9 @@
         android:orientation="vertical"
 >
     <android.support.v7.widget.Toolbar
-            xmlns:sothree="http://schemas.android.com/apk/res-auto"
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/main_toolbar"
             android:layout_height="?attr/actionBarSize"
             android:background="?attr/colorPrimary"
-            sothree:theme="@style/ActionBar"
             android:layout_width="match_parent"/>
     <TextView
             android:id="@+id/main"

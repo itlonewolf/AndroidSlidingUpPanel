@@ -1139,7 +1139,8 @@ public class SlidingUpPanelLayout extends ViewGroup {
                 if (childOfCollapsedUnderTouch != null) {
                     final View touchableViewInCollapsedView = ViewUtil.getTouchTarget(mCollapsedView, (int) rawX, (int) rawY);
                     if (touchableViewInCollapsedView != null) {
-                        touchableViewInCollapsedView.callOnClick();
+//                        touchableViewInCollapsedView.callOnClick();
+                        touchableViewInCollapsedView.performClick();
                         if (Logger.isTagEnabled("touch")) {
                             Logger.d("touch", "collapsed view 中的 %s 被点中了", touchableViewInCollapsedView);
                         }

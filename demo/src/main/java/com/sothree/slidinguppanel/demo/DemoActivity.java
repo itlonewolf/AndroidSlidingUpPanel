@@ -45,6 +45,7 @@ public class DemoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        GlobalUtil.setMainActivity(this);
         setContentView(R.layout.activity_demo);
     
         setSupportActionBar((android.support.v7.widget.Toolbar) findViewById(R.id.main_toolbar));

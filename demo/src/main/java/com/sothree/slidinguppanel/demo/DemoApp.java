@@ -14,6 +14,7 @@ public class DemoApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+    
         try {
             InputStream  in     = getAssets().open("tags.json");
             final int    size   = in.available();

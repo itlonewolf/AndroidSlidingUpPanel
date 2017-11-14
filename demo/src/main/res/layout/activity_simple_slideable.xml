@@ -1,12 +1,12 @@
-<com.sothree.slidinguppanel.demo.CusViewGroup
+<FrameLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/cus_vg"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="#fbb"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
 >
 
     <!--<Button-->
+    <!--android:id="@+id/btnInvalidate"-->
     <!--android:layout_width="wrap_content"-->
     <!--android:layout_height="wrap_content"-->
     <!--android:text="invalidate"-->
@@ -24,4 +24,4 @@
     <!--android:layout_height="wrap_content"-->
     <!--android:text="@string/demo_info"/>-->
 
-</com.sothree.slidinguppanel.demo.CusViewGroup>
+</FrameLayout>
