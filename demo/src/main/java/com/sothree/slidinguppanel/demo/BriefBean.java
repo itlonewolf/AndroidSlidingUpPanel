@@ -29,6 +29,11 @@ public class BriefBean implements IAssembleable {
     private Rect mRect;
     
     @Override
+    public void addRefreshListener(IRefreshListener listener) {
+    
+    }
+    
+    @Override
     public void initAssemble() {
     
     }

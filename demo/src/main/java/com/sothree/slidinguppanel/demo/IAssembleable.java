@@ -10,6 +10,8 @@ import android.graphics.Rect;
 
 public interface IAssembleable {
     
+    void addRefreshListener(IRefreshListener listener);
+    
     /**
      * 初始化组件
      * <p>

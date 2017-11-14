@@ -5,6 +5,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.text.TextUtils;
 
@@ -12,7 +13,7 @@ import android.text.TextUtils;
  * 第一部分
  */
 
-public class TitleBean implements IAssembleable {
+public class TitleBean extends ARefreshable {
     
     /**
      * POI名称
@@ -60,6 +61,8 @@ public class TitleBean implements IAssembleable {
     Drawable starB;
     Drawable starC;
     
+    TextPaint textPaint;
+    
     
     public TitleBean(int width) {
         this.width = width;
@@ -67,31 +70,66 @@ public class TitleBean implements IAssembleable {
     
     public static TitleBean demoBean(int width) {
         TitleBean bean = new TitleBean(width);
-        bean.name = "串亭烧烤居酒屋(东直门店)";
-        bean.price = 66;
-        bean.typeName = "川菜  中餐馆";
+        bean.name = "正在逆地理";
+        bean.price = 0;
+        bean.typeName = "XX  XXX";
         return bean;
     }
     
     @Override
-    public void initAssemble() {
-        final TextPaint textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    public void refresh() {
+        this.name = "串亭烧烤居酒屋(东直门店)";
+        this.price = 66;
+        this.typeName = "川菜  中餐馆";
         
-        mNameTextPoint = new Point();
-        mPriceTextPoint = new Point();
-        mContentBound = new Rect();
-        
-        TextArtist.TextArtistSetting nameArtistSetting = new TextArtist.TextArtistSetting(textPaint);
-        nameArtistSetting.setAlign(TextArtist.ALIGN_LC);
-        nameArtistSetting.append(name).absoluteSize(SP18);
-        if (!TextUtils.isEmpty(poiLoc)) {
-            nameArtistSetting.append(poiLoc).absoluteSize(SP14);
-        }
-        nameArtistSetting.setMaxLineCount(1);
-        nameArtistSetting.setOuterWidth((int) width);
+        TextArtist.TextArtistSetting nameArtistSetting = getNameTextArtistSetting(textPaint);
         mNameTextArtist = new TextArtist(nameArtistSetting);
         
         
+        TextArtist.TextArtistSetting priceArtistSetting = getDIstanceTextArtistSetting(textPaint);
+        mPriceTextArtist = new TextArtist(priceArtistSetting);
+        
+        if (mRefreshListener != null) {
+            mRefreshListener.onRefresh(mContentBound);
+        }
+    }
+    
+    
+    @Override
+    public void initAssemble() {
+        textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
+    
+        mNameTextPoint = new Point();
+        mPriceTextPoint = new Point();
+        mContentBound = new Rect();
+    
+        TextArtist.TextArtistSetting nameArtistSetting = getNameTextArtistSetting(textPaint);
+        mNameTextArtist = new TextArtist(nameArtistSetting);
+    
+    
+        TextArtist.TextArtistSetting priceArtistSetting = getDIstanceTextArtistSetting(textPaint);
+        mPriceTextArtist = new TextArtist(priceArtistSetting);
+    
+        Rect nameBounds = new Rect();
+        textPaint.setTextSize(SP18);
+        textPaint.getTextBounds(name, 0, name.length(), nameBounds);
+        nameTextHeight = nameBounds.height();
+    
+        Rect priceBounds = new Rect();
+        textPaint.setTextSize(SP14);
+        textPaint.getTextBounds(name, 0, name.length(), priceBounds);
+        priceTextHeight = priceBounds.height();
+    
+        starA = GlobalUtil.getResources().getDrawable(R.drawable.star_1);
+        starB = GlobalUtil.getResources().getDrawable(R.drawable.star_2);
+        starC = GlobalUtil.getResources().getDrawable(R.drawable.star_3);
+    
+        height = DP30 * 2 + DP5 + nameTextHeight + priceTextHeight;
+    
+    }
+    
+    @NonNull
+    private TextArtist.TextArtistSetting getDIstanceTextArtistSetting(TextPaint textPaint) {
         TextArtist.TextArtistSetting priceArtistSetting = new TextArtist.TextArtistSetting(textPaint);
         priceArtistSetting.setAlign(TextArtist.ALIGN_LC);
         priceArtistSetting.appendImage(R.drawable.star_1);
@@ -103,24 +141,20 @@ public class TitleBean implements IAssembleable {
         
         priceArtistSetting.setMaxLineCount(1);
         priceArtistSetting.setOuterWidth((int) width);
-        mPriceTextArtist = new TextArtist(priceArtistSetting);
-        
-        Rect nameBounds = new Rect();
-        textPaint.setTextSize(SP18);
-        textPaint.getTextBounds(name, 0, name.length(), nameBounds);
-        nameTextHeight = nameBounds.height();
-        
-        Rect priceBounds = new Rect();
-        textPaint.setTextSize(SP14);
-        textPaint.getTextBounds(name, 0, name.length(), priceBounds);
-        priceTextHeight = priceBounds.height();
-        
-        starA = GlobalUtil.getResources().getDrawable(R.drawable.star_1);
-        starB = GlobalUtil.getResources().getDrawable(R.drawable.star_2);
-        starC = GlobalUtil.getResources().getDrawable(R.drawable.star_3);
-        
-        height = DP30 * 2 + DP5 + nameTextHeight + priceTextHeight;
-        
+        return priceArtistSetting;
+    }
+    
+    @NonNull
+    private TextArtist.TextArtistSetting getNameTextArtistSetting(TextPaint textPaint) {
+        TextArtist.TextArtistSetting nameArtistSetting = new TextArtist.TextArtistSetting(textPaint);
+        nameArtistSetting.setAlign(TextArtist.ALIGN_LC);
+        nameArtistSetting.append(name).absoluteSize(SP18);
+        if (!TextUtils.isEmpty(poiLoc)) {
+            nameArtistSetting.append(poiLoc).absoluteSize(SP14);
+        }
+        nameArtistSetting.setMaxLineCount(1);
+        nameArtistSetting.setOuterWidth((int) width);
+        return nameArtistSetting;
     }
     
     public void setName(String name) {

@@ -7,7 +7,7 @@ import android.text.TextPaint;
  * Created by xiaoyee on 2017/11/14.
  */
 
-public class DistanceBean implements IAssembleable {
+public class DistanceBean extends ARefreshable {
     Paint mLinePaint;
     
     TextPaint textPaint;
@@ -20,7 +20,7 @@ public class DistanceBean implements IAssembleable {
     private String distance;
     
     private float width;
-    Rect clipBound;
+    Rect mContentBound;
     
     private int SP16 = LayoutUtils.getPxByDimens(R.dimen.sp16);
     private int DP44 = LayoutUtils.getPxByDimens(R.dimen.dp44);
@@ -31,9 +31,17 @@ public class DistanceBean implements IAssembleable {
     
     public static DistanceBean demoBean(float width) {
         final DistanceBean distanceBean = new DistanceBean(width);
-        distanceBean.time = "1小时30分钟";
+        distanceBean.time = "正在计算...";
         distanceBean.distance = "60公里";
         return distanceBean;
+    }
+    
+    @Override
+    public void refresh() {
+        this.time = "1小时 30分钟";
+        if (mRefreshListener != null) {
+            mRefreshListener.onRefresh(mContentBound);
+        }
     }
     
     @Override
@@ -45,8 +53,8 @@ public class DistanceBean implements IAssembleable {
         
         
         mCarTextPoint = new Point();
-        
-        clipBound = new Rect();
+    
+        mContentBound = new Rect();
         textPaint = new TextPaint();
         TextArtist.TextArtistSetting priceArtistSetting = new TextArtist.TextArtistSetting(textPaint);
         priceArtistSetting.setAlign(TextArtist.ALIGN_CC);
@@ -80,6 +88,7 @@ public class DistanceBean implements IAssembleable {
     
     @Override
     public void drawContent(Canvas canvas, Rect rect) {
+        mContentBound.set(rect);
         int left   = rect.left;
         int top    = rect.top;
         int right  = rect.right;

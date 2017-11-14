@@ -36,6 +36,13 @@ public class AssembleView extends View {
     Rect titleRect    = new Rect();
     Rect distanceRect = new Rect();
     
+    private IRefreshListener mRefreshListener = new IRefreshListener() {
+        @Override
+        public void onRefresh(Rect refreshBounds) {
+            invalidate(refreshBounds);
+        }
+    };
+    
     public AssembleView(Context context) {
         super(context);
         DisplayMetrics dm = GlobalUtil.getResources().getDisplayMetrics();
@@ -55,14 +62,20 @@ public class AssembleView extends View {
         distanceRect.set(0, DP110, viewWidth, DP110 + DP44);
         Log.d("AssembleDraw", String.format("title bounds: %s", titleRect));
         Log.d("AssembleDraw", String.format("distance bounds: %s", distanceRect));
+    
+        mTitleBean.addRefreshListener(mRefreshListener);
+        mDistanceBean.addRefreshListener(mRefreshListener);
     }
     
     public void refreshTitle() {
 //        invalidate(titleRect);
 //        invalidate();
 //        postInvalidate();
-        invalidate(titleRect);
+//        invalidate(titleRect);
+        mTitleBean.refresh();
     }
+    
+    boolean isFirst = true;
     
     @Override
     public void draw(Canvas canvas) {
@@ -75,7 +88,9 @@ public class AssembleView extends View {
             Log.d("AssembleDraw", String.format("有 clip bounds: %s", mClipBounds));
             if (Rect.intersects(mClipBounds, titleRect)) {
                 Log.d("AssembleDraw", "clip bounds 与 title 相交");
-                canvas.drawColor(Color.GRAY);
+                if (!isFirst) {
+                    canvas.drawColor(Color.GRAY);
+                }
                 mTitleBean.drawContent(canvas, titleRect);
             } else {
                 Log.d("AssembleDraw", "clip bounds 不与 title 相交");
@@ -92,6 +107,7 @@ public class AssembleView extends View {
             mTitleBean.drawContent(canvas, titleRect);
             mDistanceBean.drawContent(canvas, distanceRect);
         }
+        isFirst = false;
     }
     
     @Override
