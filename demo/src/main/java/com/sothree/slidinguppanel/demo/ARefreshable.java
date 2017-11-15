@@ -46,6 +46,7 @@ public abstract class ARefreshable {
     abstract void initAssemble();
     
     public final void drawContent(Canvas canvas) {
+        //idea save 和 restore 的使用是防止在本组件中做的变换影响到其他组件
         final int saveFlag = canvas.save();
         drawContentInner(canvas);
         canvas.restoreToCount(saveFlag);
@@ -72,5 +73,5 @@ public abstract class ARefreshable {
         mContentBound.set(left, top, left + width, top + height);
     }
     
-    public abstract void drawContentInner(Canvas canvas);
+    protected abstract void drawContentInner(Canvas canvas);
 }
