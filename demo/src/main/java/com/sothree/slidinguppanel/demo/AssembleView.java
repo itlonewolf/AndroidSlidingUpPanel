@@ -21,9 +21,23 @@ public class AssembleView extends View {
     
     public static final int UNSET_POSTION = -1024;
     
+    /**
+     * 需要绘制的组件的集合
+     */
     private ArrayList<ARefreshable> mRefreshables;
-    private SparseArray<Rect>       mTouchableBounds;
-    private Region                  mTouchableRegion;
+    
+    /**
+     * 所有可以点击或者触摸有效果的组件区域集合;
+     * <ul>
+     * <li>key:{@link ARefreshable#getId()}</li>
+     * <li>value:{@link ARefreshable#getBounds()}</li>
+     * </ul>
+     */
+    private SparseArray<Rect> mTouchableBounds;
+    /**
+     * 所有可以点击或者触摸有效果的组件的区域
+     */
+    private Region            mTouchableRegion;
     
     Rect mClipBounds;
     
@@ -40,7 +54,11 @@ public class AssembleView extends View {
     
     public AssembleView(Context context) {
         super(context);
+        
+        initVariable();
+    }
     
+    private void initVariable() {
         mRefreshables = new ArrayList<>();
         mTouchableBounds = new SparseArray<>();
         mTouchableRegion = new Region();
