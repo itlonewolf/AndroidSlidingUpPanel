@@ -14,6 +14,15 @@ public abstract class ARefreshable {
     Rect mContentBound = new Rect();
     private View.OnClickListener mOnClickListener;
     private boolean mIsClickable = false;
+    private int id;
+    
+    public ARefreshable() {
+        id = System.identityHashCode(this);
+    }
+    
+    public int getId() {
+        return id;
+    }
     
     public void setOnClickListener(View.OnClickListener listener) {
         this.mOnClickListener = listener;

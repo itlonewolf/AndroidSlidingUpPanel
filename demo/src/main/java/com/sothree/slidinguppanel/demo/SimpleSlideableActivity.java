@@ -3,6 +3,7 @@ package com.sothree.slidinguppanel.demo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
 import android.widget.FrameLayout;
 
 public class SimpleSlideableActivity extends AppCompatActivity {
@@ -18,6 +19,9 @@ public class SimpleSlideableActivity extends AppCompatActivity {
         linearLayout = (FrameLayout) findViewById(R.id.cus_vg);
 //        btnInvalidate = (Button) findViewById(R.id.btnInvalidate);
         mAssembleView = new AssembleView(this);
+    
+        demoCase();
+        
         mAssembleView.setClickable(true);
         mAssembleView.setTranslationY(200);
         linearLayout.addView(mAssembleView);
@@ -34,5 +38,13 @@ public class SimpleSlideableActivity extends AppCompatActivity {
                 mAssembleView.requestLayout();
             }
         }, 10000);
+    }
+    
+    
+    public void demoCase() {
+        DisplayMetrics dm           = GlobalUtil.getResources().getDisplayMetrics();
+        ARefreshable   titleBean    = TitleBean.demoBean(dm.widthPixels);
+        ARefreshable   distanceBean = DistanceBean.demoBean(dm.widthPixels);
+        mAssembleView.addRefreshableItem(titleBean, distanceBean);
     }
 }

@@ -3,12 +3,15 @@ package com.sothree.slidinguppanel.demo;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.graphics.Region;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
+
+import java.util.ArrayList;
 
 /**
  * custom view
@@ -16,8 +19,11 @@ import android.view.View;
 
 public class AssembleView extends View {
     
-    TitleBean    mTitleBean;
-    DistanceBean mDistanceBean;
+    public static final int UNSET_POSTION = -1024;
+    
+    private ArrayList<ARefreshable> mRefreshables;
+    private SparseArray<Rect>       mTouchableBounds;
+    private Region                  mTouchableRegion;
     
     Rect mClipBounds;
     
@@ -34,23 +40,60 @@ public class AssembleView extends View {
     
     public AssembleView(Context context) {
         super(context);
-        DisplayMetrics dm = GlobalUtil.getResources().getDisplayMetrics();
-        mTitleBean = TitleBean.demoBean(dm.widthPixels);
-        mTitleBean.initAssemble();
-        mTitleBean.updatePosition(0, 0);
-        
-        mDistanceBean = DistanceBean.demoBean(dm.widthPixels);
-        mDistanceBean.initAssemble();
-        mDistanceBean.updatePosition(0, mTitleBean.height());
+    
+        mRefreshables = new ArrayList<>();
+        mTouchableBounds = new SparseArray<>();
+        mTouchableRegion = new Region();
         
         mClipBounds = new Rect();
+    }
+    
+    public void addRefreshableItem(ARefreshable item) {
+        addRefreshableItem(item, UNSET_POSTION);
+    }
+    
+    public void addRefreshableItem(ARefreshable item, int position) {
         
-        mTitleBean.addRefreshListener(mRefreshListener);
-        mDistanceBean.addRefreshListener(mRefreshListener);
+        item.initAssemble();
+        item.addRefreshListener(mRefreshListener);
+        
+        if (position == UNSET_POSTION) {
+            mRefreshables.add(item);
+            return;
+        }
+        
+        final int size = mRefreshables.size();
+        if (position >= size || position < 0) {
+            mRefreshables.add(item);
+            return;
+        }
+        
+        mRefreshables.add(position, item);
+        // FIXME: 2017/11/15 判断是否需要 requestLayout
+    }
+    
+    public void addRefreshableItem(ARefreshable... refreshableItems) {
+        for (ARefreshable refreshable : refreshableItems) {
+            addRefreshableItem(refreshable);
+        }
+    }
+    
+    public void setRefreshables(ArrayList<ARefreshable> items) {
+        mRefreshables.clear();
+        for (ARefreshable refreshable : items) {
+            addRefreshableItem(refreshable);
+        }
     }
     
     public void refreshTitle() {
-        mTitleBean.refresh();
+        ARefreshable refreshable = mRefreshables.get(0);
+        if (refreshable instanceof TitleBean) {
+            TitleBean bean = (TitleBean) refreshable;
+            bean.refresh();
+        } else if (refreshable instanceof DistanceBean) {
+            DistanceBean bean = (DistanceBean) refreshable;
+            bean.refresh();
+        }
     }
     
     @Override
@@ -67,24 +110,17 @@ public class AssembleView extends View {
         
         if (hasClipBounds) {
             canvas.clipRect(mClipBounds);
-            Log.d("AssembleDraw", String.format("有 clip bounds: %s", mClipBounds));
-            if (Rect.intersects(mClipBounds, mTitleBean.getBounds())) {
-                Log.d("AssembleDraw", "clip bounds 与 title 相交");
-                mTitleBean.drawContent(canvas);
-            } else {
-                Log.d("AssembleDraw", "clip bounds 不与 title 相交");
-            }
-            if (Rect.intersects(mClipBounds, mDistanceBean.getBounds())) {
-                Log.d("AssembleDraw", "clip bounds 与 distance 相交");
-                mDistanceBean.drawContent(canvas);
-            } else {
-                Log.d("AssembleDraw", "clip bounds 不与 distance 相交");
+    
+            for (ARefreshable refreshable : mRefreshables) {
+                if (Rect.intersects(refreshable.getBounds(), mClipBounds)) {
+                    refreshable.drawContent(canvas);
+                }
             }
         } else {
             Log.d("AssembleDraw", String.format("没有 clip bounds: %s", mClipBounds));
-    
-            mTitleBean.drawContent(canvas);
-            mDistanceBean.drawContent(canvas);
+            for (ARefreshable refreshable : mRefreshables) {
+                refreshable.drawContent(canvas);
+            }
         }
     }
     
@@ -93,14 +129,27 @@ public class AssembleView extends View {
         Log.d("AssembleDraw", "onMeasure");
         
         int width  = MeasureSpec.getSize(widthMeasureSpec);
-        int height = mDistanceBean.height() + mTitleBean.height();
+    
+        int height = 0;
+        for (ARefreshable refreshable : mRefreshables) {
+            height += refreshable.height();
+        }
         
         setMeasuredDimension(width, height);
     }
     
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        super.onLayout(changed, left, top, right, bottom);
         Log.d("AssembleDraw", "onLayout");
+    
+        int leftPos = 0;
+        int topPos  = 0;
+    
+        for (ARefreshable refreshable : mRefreshables) {
+            refreshable.updatePosition(leftPos, topPos);
+            mTouchableBounds.put(refreshable.getId(), refreshable.getBounds());
+            mTouchableRegion.union(refreshable.getBounds());
+            topPos += refreshable.height();
+        }
     }
 }
