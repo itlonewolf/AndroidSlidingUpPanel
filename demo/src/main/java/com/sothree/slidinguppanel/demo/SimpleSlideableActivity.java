@@ -12,23 +12,22 @@ public class SimpleSlideableActivity extends AppCompatActivity {
     AssembleView mAssembleView;
 //    Button btnInvalidate;
     
+    TitleBean refreshTitle;
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_simple_slideable);
         linearLayout = (FrameLayout) findViewById(R.id.cus_vg);
-//        btnInvalidate = (Button) findViewById(R.id.btnInvalidate);
-        mAssembleView = new AssembleView(this);
     
+        mAssembleView = (AssembleView) findViewById(R.id.assembleView);
         demoCase();
-        
+    
         mAssembleView.setClickable(true);
-        mAssembleView.setTranslationY(200);
-        linearLayout.addView(mAssembleView);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                mAssembleView.refreshTitle();
+                refreshTitle();
             }
         }, 5000);
     
@@ -40,11 +39,16 @@ public class SimpleSlideableActivity extends AppCompatActivity {
         }, 10000);
     }
     
+    public void refreshTitle() {
+        refreshTitle.refresh();
+    }
+    
     
     public void demoCase() {
-        DisplayMetrics dm           = GlobalUtil.getResources().getDisplayMetrics();
-        ARefreshable   titleBean    = TitleBean.demoBean(dm.widthPixels);
+        DisplayMetrics dm = GlobalUtil.getResources().getDisplayMetrics();
+    
+        refreshTitle = TitleBean.demoBean(dm.widthPixels);
         ARefreshable   distanceBean = DistanceBean.demoBean(dm.widthPixels);
-        mAssembleView.addRefreshableItem(titleBean, distanceBean);
+        mAssembleView.addRefreshableItem(refreshTitle, distanceBean);
     }
 }

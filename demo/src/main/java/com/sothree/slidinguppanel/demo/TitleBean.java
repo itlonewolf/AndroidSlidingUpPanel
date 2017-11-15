@@ -134,7 +134,7 @@ public class TitleBean extends ARefreshable {
         priceArtistSetting.append(String.format("人均:¥ %s  %s", price, typeName)).absoluteSize(SP14);
         
         priceArtistSetting.setMaxLineCount(1);
-        priceArtistSetting.setOuterWidth((int) width);
+        priceArtistSetting.setOuterWidth(width);
         return priceArtistSetting;
     }
     

@@ -29,8 +29,8 @@ public class AssembleView extends View {
     /**
      * 所有可以点击或者触摸有效果的组件区域集合;
      * <ul>
-     * <li>key:{@link ARefreshable#getId()}</li>
-     * <li>value:{@link ARefreshable#getBounds()}</li>
+     *      <li>key:{@link ARefreshable#getId()}</li>
+     *      <li>value:{@link ARefreshable#getBounds()}</li>
      * </ul>
      */
     private SparseArray<Rect> mTouchableBounds;
@@ -41,10 +41,6 @@ public class AssembleView extends View {
     
     Rect mClipBounds;
     
-    public AssembleView(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-    }
-    
     private IRefreshListener mRefreshListener = new IRefreshListener() {
         @Override
         public void onRefresh(Rect refreshBounds) {
@@ -52,9 +48,13 @@ public class AssembleView extends View {
         }
     };
     
+    public AssembleView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
+        initVariable();
+    }
+    
     public AssembleView(Context context) {
         super(context);
-        
         initVariable();
     }
     
@@ -96,21 +96,13 @@ public class AssembleView extends View {
         }
     }
     
+    /**
+     * 设置新的组件集合;此操作会将之前的所有组件清空
+     */
     public void setRefreshables(ArrayList<ARefreshable> items) {
         mRefreshables.clear();
         for (ARefreshable refreshable : items) {
             addRefreshableItem(refreshable);
-        }
-    }
-    
-    public void refreshTitle() {
-        ARefreshable refreshable = mRefreshables.get(0);
-        if (refreshable instanceof TitleBean) {
-            TitleBean bean = (TitleBean) refreshable;
-            bean.refresh();
-        } else if (refreshable instanceof DistanceBean) {
-            DistanceBean bean = (DistanceBean) refreshable;
-            bean.refresh();
         }
     }
     
