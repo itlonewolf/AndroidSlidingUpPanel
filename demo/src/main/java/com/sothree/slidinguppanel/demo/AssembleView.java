@@ -2,13 +2,12 @@ package com.sothree.slidinguppanel.demo;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 
 /**
@@ -16,25 +15,15 @@ import android.view.View;
  */
 
 public class AssembleView extends View {
+    
     TitleBean    mTitleBean;
     DistanceBean mDistanceBean;
-    Drawable     starA;
     
     Rect mClipBounds;
-    
-    private int DP30  = LayoutUtils.getPxByDimens(R.dimen.dp30);
-    private int DP110 = LayoutUtils.getPxByDimens(R.dimen.dp110);
-    private int DP44  = LayoutUtils.getPxByDimens(R.dimen.dp44);
-    private int DP15  = LayoutUtils.getPxByDimens(R.dimen.dp15);
     
     public AssembleView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
-    
-    private int viewWidth;
-    
-    Rect titleRect    = new Rect();
-    Rect distanceRect = new Rect();
     
     private IRefreshListener mRefreshListener = new IRefreshListener() {
         @Override
@@ -46,36 +35,29 @@ public class AssembleView extends View {
     public AssembleView(Context context) {
         super(context);
         DisplayMetrics dm = GlobalUtil.getResources().getDisplayMetrics();
-        viewWidth = dm.widthPixels;
         mTitleBean = TitleBean.demoBean(dm.widthPixels);
         mTitleBean.initAssemble();
+        mTitleBean.updatePosition(0, 0);
         
         mDistanceBean = DistanceBean.demoBean(dm.widthPixels);
         mDistanceBean.initAssemble();
+        mDistanceBean.updatePosition(0, mTitleBean.height());
         
-        starA = GlobalUtil.getResources().getDrawable(R.drawable.star_1);
-
-//        setClipBounds(new Rect(0, 0, 400, 400));
         mClipBounds = new Rect();
         
-        titleRect.set(0, 0, viewWidth, DP110);
-        distanceRect.set(0, DP110, viewWidth, DP110 + DP44);
-        Log.d("AssembleDraw", String.format("title bounds: %s", titleRect));
-        Log.d("AssembleDraw", String.format("distance bounds: %s", distanceRect));
-    
         mTitleBean.addRefreshListener(mRefreshListener);
         mDistanceBean.addRefreshListener(mRefreshListener);
     }
     
     public void refreshTitle() {
-//        invalidate(titleRect);
-//        invalidate();
-//        postInvalidate();
-//        invalidate(titleRect);
         mTitleBean.refresh();
     }
     
-    boolean isFirst = true;
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        
+        return super.onTouchEvent(event);
+    }
     
     @Override
     public void draw(Canvas canvas) {
@@ -86,28 +68,24 @@ public class AssembleView extends View {
         if (hasClipBounds) {
             canvas.clipRect(mClipBounds);
             Log.d("AssembleDraw", String.format("有 clip bounds: %s", mClipBounds));
-            if (Rect.intersects(mClipBounds, titleRect)) {
+            if (Rect.intersects(mClipBounds, mTitleBean.getBounds())) {
                 Log.d("AssembleDraw", "clip bounds 与 title 相交");
-                if (!isFirst) {
-                    canvas.drawColor(Color.GRAY);
-                }
-                mTitleBean.drawContent(canvas, titleRect);
+                mTitleBean.drawContent(canvas);
             } else {
                 Log.d("AssembleDraw", "clip bounds 不与 title 相交");
             }
-            if (Rect.intersects(mClipBounds, distanceRect)) {
+            if (Rect.intersects(mClipBounds, mDistanceBean.getBounds())) {
                 Log.d("AssembleDraw", "clip bounds 与 distance 相交");
-                mDistanceBean.drawContent(canvas, distanceRect);
+                mDistanceBean.drawContent(canvas);
             } else {
                 Log.d("AssembleDraw", "clip bounds 不与 distance 相交");
             }
         } else {
             Log.d("AssembleDraw", String.format("没有 clip bounds: %s", mClipBounds));
-            
-            mTitleBean.drawContent(canvas, titleRect);
-            mDistanceBean.drawContent(canvas, distanceRect);
+    
+            mTitleBean.drawContent(canvas);
+            mDistanceBean.drawContent(canvas);
         }
-        isFirst = false;
     }
     
     @Override
@@ -115,7 +93,7 @@ public class AssembleView extends View {
         Log.d("AssembleDraw", "onMeasure");
         
         int width  = MeasureSpec.getSize(widthMeasureSpec);
-        int height = (int) (mDistanceBean.getHeight() + mTitleBean.getHeight());
+        int height = mDistanceBean.height() + mTitleBean.height();
         
         setMeasuredDimension(width, height);
     }

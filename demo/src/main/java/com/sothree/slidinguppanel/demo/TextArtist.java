@@ -9,6 +9,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.text.*;
 import android.text.Layout.Alignment;
@@ -435,7 +436,6 @@ public class TextArtist {
             ssb.setSpan(what, indexs.start, indexs.end, SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
         }
         
-        
         /**
          * 添加图片, 小图标
          *
@@ -483,6 +483,35 @@ public class TextArtist {
             ssb.setSpan(what, len, ssb.length(),
                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                        );
+        }
+    
+    
+        public void appendImageWithHeight(@DrawableRes int iconId, int height) {
+            final Drawable drawable = GlobalUtil.getResources().getDrawable(iconId);
+            int            width    = drawable.getIntrinsicWidth();
+            if (height > 0) {
+                final int intrinsicW = drawable.getIntrinsicWidth();
+                final int intrinsicH = drawable.getIntrinsicHeight();
+                width = (intrinsicW * height) / intrinsicH;
+            }
+            appendImage(drawable, null, width, height, DynamicDrawableSpan.ALIGN_BASELINE);
+        }
+    
+        /**
+         * 添加图片,且按照给定高度等比例缩放
+         */
+        public void appendImage(Drawable drawable, String source, int width, int height, int align) {
+            if (height > 0 && width > 0) {
+                drawable.setBounds(0, 0, width, height);
+            }
+            final ImageSpan what = new ImageSpan(drawable, source, align);
+        
+            int len = ssb.length();
+            ssb.append("\uFFFC");
+            ssb.setSpan(what, len, ssb.length(),
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                       );
+        
         }
         
         

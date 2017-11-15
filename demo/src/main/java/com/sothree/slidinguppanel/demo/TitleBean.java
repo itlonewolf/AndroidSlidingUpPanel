@@ -4,7 +4,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.text.TextUtils;
@@ -44,24 +43,18 @@ public class TitleBean extends ARefreshable {
     private int DP15  = LayoutUtils.getPxByDimens(R.dimen.dp15);
     private int DP5   = LayoutUtils.getPxByDimens(R.dimen.dp5);
     
-    float width;//文本的宽度
-    int   height;//文本的高度
+    private final int width;//文本的宽度
+    private       int height;//文本的高度
     
-    TextArtist mNameTextArtist;
-    Point      mNameTextPoint;
-    int        nameTextHeight;
+    private TextArtist mNameTextArtist;
+    private Point      mNameTextPoint;
+    private int        nameTextHeight;
     
-    TextArtist mPriceTextArtist;
-    Point      mPriceTextPoint;
-    int        priceTextHeight;
+    private TextArtist mPriceTextArtist;
+    private Point      mPriceTextPoint;
+    private int        priceTextHeight;
     
-    Rect mContentBound;
-    
-    Drawable starA;
-    Drawable starB;
-    Drawable starC;
-    
-    TextPaint textPaint;
+    private TextPaint textPaint;
     
     
     public TitleBean(int width) {
@@ -76,7 +69,6 @@ public class TitleBean extends ARefreshable {
         return bean;
     }
     
-    @Override
     public void refresh() {
         this.name = "串亭烧烤居酒屋(东直门店)";
         this.price = 66;
@@ -85,10 +77,10 @@ public class TitleBean extends ARefreshable {
         TextArtist.TextArtistSetting nameArtistSetting = getNameTextArtistSetting(textPaint);
         mNameTextArtist = new TextArtist(nameArtistSetting);
         
-        
         TextArtist.TextArtistSetting priceArtistSetting = getDIstanceTextArtistSetting(textPaint);
         mPriceTextArtist = new TextArtist(priceArtistSetting);
-        
+    
+        updateSize();
         if (mRefreshListener != null) {
             mRefreshListener.onRefresh(mContentBound);
         }
@@ -110,22 +102,24 @@ public class TitleBean extends ARefreshable {
         TextArtist.TextArtistSetting priceArtistSetting = getDIstanceTextArtistSetting(textPaint);
         mPriceTextArtist = new TextArtist(priceArtistSetting);
     
-        Rect nameBounds = new Rect();
-        textPaint.setTextSize(SP18);
-        textPaint.getTextBounds(name, 0, name.length(), nameBounds);
-        nameTextHeight = nameBounds.height();
+        updateSize();
+    }
     
-        Rect priceBounds = new Rect();
-        textPaint.setTextSize(SP14);
-        textPaint.getTextBounds(name, 0, name.length(), priceBounds);
-        priceTextHeight = priceBounds.height();
+    @Override
+    public int height() {
+        return height;
+    }
     
-        starA = GlobalUtil.getResources().getDrawable(R.drawable.star_1);
-        starB = GlobalUtil.getResources().getDrawable(R.drawable.star_2);
-        starC = GlobalUtil.getResources().getDrawable(R.drawable.star_3);
+    @Override
+    public int width() {
+        return width;
+    }
     
+    private void updateSize() {
+        nameTextHeight = mNameTextArtist.getHeight();
+        priceTextHeight = mPriceTextArtist.getHeight();
         height = DP30 * 2 + DP5 + nameTextHeight + priceTextHeight;
-    
+        updateBoundsInner(width, height);
     }
     
     @NonNull
@@ -153,7 +147,7 @@ public class TitleBean extends ARefreshable {
             nameArtistSetting.append(poiLoc).absoluteSize(SP14);
         }
         nameArtistSetting.setMaxLineCount(1);
-        nameArtistSetting.setOuterWidth((int) width);
+        nameArtistSetting.setOuterWidth(width);
         return nameArtistSetting;
     }
     
@@ -162,43 +156,23 @@ public class TitleBean extends ARefreshable {
     }
     
     @Override
-    public void drawContent(Canvas canvas, Rect rect) {
-        mContentBound.set(rect);
-        
-        final int titleFlag = canvas.save();
-        
+    public void drawContentInner(Canvas canvas) {
         //step 1、先将画布移动到对应位置
         canvas.translate(DP30, DP15);
-        int left = rect.left;
-        int top  = rect.top;
-        
-        
+        int left = mContentBound.left;
+        int top  = mContentBound.top;
+    
         //step 2、再绘制
         //step 2.1、先绘制 name
         mNameTextPoint.set(left, nameTextHeight / 2 + top);
         mNameTextArtist.setAlignReferencePoint(mNameTextPoint);
         mNameTextArtist.draw(canvas);
-        
+    
         //step 2.2、再绘制星星一行
         top += DP5 + nameTextHeight;
         mPriceTextPoint.set(left, priceTextHeight / 2 + top);
         mPriceTextArtist.setAlignReferencePoint(mPriceTextPoint);
         mPriceTextArtist.draw(canvas);
-        
-        canvas.restoreToCount(titleFlag);
-    }
-    
-    
-    public float getWidth() {
-        return width;
-    }
-    
-    public float getHeight() {
-        return DP110;
-    }
-    
-    public Rect getRect() {
-        return mContentBound;
     }
     
 }

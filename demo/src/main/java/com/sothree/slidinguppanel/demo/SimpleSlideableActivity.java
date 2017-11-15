@@ -19,6 +19,7 @@ public class SimpleSlideableActivity extends AppCompatActivity {
 //        btnInvalidate = (Button) findViewById(R.id.btnInvalidate);
         mAssembleView = new AssembleView(this);
         mAssembleView.setClickable(true);
+        mAssembleView.setTranslationY(200);
         linearLayout.addView(mAssembleView);
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -26,5 +27,12 @@ public class SimpleSlideableActivity extends AppCompatActivity {
                 mAssembleView.refreshTitle();
             }
         }, 5000);
+    
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mAssembleView.requestLayout();
+            }
+        }, 10000);
     }
 }

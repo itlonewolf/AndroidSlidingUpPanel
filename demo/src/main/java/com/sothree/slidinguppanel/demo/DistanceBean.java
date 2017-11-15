@@ -2,6 +2,7 @@ package com.sothree.slidinguppanel.demo;
 
 import android.graphics.*;
 import android.text.TextPaint;
+import android.view.View;
 
 /**
  * Created by xiaoyee on 2017/11/14.
@@ -14,29 +15,35 @@ public class DistanceBean extends ARefreshable {
     
     TextArtist mCarTextArtist;
     Point      mCarTextPoint;
-    int        mCarTextHeight;
     
     private String time;
     private String distance;
     
-    private float width;
-    Rect mContentBound;
+    private int width;
+    private int height;
     
     private int SP16 = LayoutUtils.getPxByDimens(R.dimen.sp16);
+    private int DP16 = LayoutUtils.getPxByDimens(R.dimen.dp16);
+    private int DP20 = LayoutUtils.getPxByDimens(R.dimen.dp20);
     private int DP44 = LayoutUtils.getPxByDimens(R.dimen.dp44);
     
-    public DistanceBean(float width) {
+    public DistanceBean(int width) {
         this.width = width;
     }
     
-    public static DistanceBean demoBean(float width) {
+    public static DistanceBean demoBean(int width) {
         final DistanceBean distanceBean = new DistanceBean(width);
         distanceBean.time = "正在计算...";
         distanceBean.distance = "60公里";
+        distanceBean.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                distanceBean.refresh();
+            }
+        });
         return distanceBean;
     }
     
-    @Override
     public void refresh() {
         this.time = "1小时 30分钟";
         if (mRefreshListener != null) {
@@ -58,46 +65,38 @@ public class DistanceBean extends ARefreshable {
         textPaint = new TextPaint();
         TextArtist.TextArtistSetting priceArtistSetting = new TextArtist.TextArtistSetting(textPaint);
         priceArtistSetting.setAlign(TextArtist.ALIGN_CC);
-//        priceArtistSetting.appendImage(R.drawable.car, ImageSpan.ALIGN_BOTTOM);
+        priceArtistSetting.appendImageWithHeight(R.drawable.car, DP20);
         priceArtistSetting.append(String.format("  %s  %s", time, distance)).absoluteSize(SP16);
         
         priceArtistSetting.setMaxLineCount(1);
-        priceArtistSetting.setOuterWidth((int) width);
+        priceArtistSetting.setOuterWidth(width);
         mCarTextArtist = new TextArtist(priceArtistSetting);
-        
-        Rect nameBounds = new Rect();
-        textPaint.setTextSize(SP16);
-        textPaint.getTextBounds(time, 0, time.length(), nameBounds);
-        mCarTextHeight = nameBounds.height();
+    
+        height = DP44;
+        updateBoundsInner(width, height);
     }
     
     @Override
-    public float getWidth() {
+    public int height() {
+        return height;
+    }
+    
+    @Override
+    public int width() {
         return width;
     }
     
     @Override
-    public float getHeight() {
-        return DP44;
-    }
-    
-    @Override
-    public Rect getRect() {
-        return null;
-    }
-    
-    @Override
-    public void drawContent(Canvas canvas, Rect rect) {
-        mContentBound.set(rect);
-        int left   = rect.left;
-        int top    = rect.top;
-        int right  = rect.right;
-        int bottom = rect.bottom;
+    public void drawContentInner(Canvas canvas) {
+        int left   = mContentBound.left;
+        int top    = mContentBound.top;
+        int right  = mContentBound.right;
+        int bottom = mContentBound.bottom;
         
         canvas.drawLine(left, top, right, top, mLinePaint);
         canvas.drawLine(left, bottom - 2, right, bottom - 2, mLinePaint);
-        
-        mCarTextPoint.set(rect.width() / 2, rect.height() / 2 + top);
+    
+        mCarTextPoint.set(mContentBound.width() / 2, mContentBound.height() / 2 + top);
         mCarTextArtist.setAlignReferencePoint(mCarTextPoint);
         mCarTextArtist.draw(canvas);
     }
