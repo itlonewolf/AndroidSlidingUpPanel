@@ -9,9 +9,11 @@ import android.text.TextPaint;
 import android.util.Log;
 
 /**
- * 收费情况
+ * $车位信息$
+ *
+ * @author zhaozy
+ * @date 2017/11/17
  */
-
 public class ParkingBean extends ARefreshable {
     /**
      * 文本宽度

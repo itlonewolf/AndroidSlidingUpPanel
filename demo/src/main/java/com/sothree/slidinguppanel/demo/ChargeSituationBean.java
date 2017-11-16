@@ -7,7 +7,10 @@ import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
 /**
- * 收费情况
+ * $收费情况$
+ *
+ * @author zhaozy
+ * @date 2017/11/17
  */
 
 public class ChargeSituationBean extends ARefreshable {

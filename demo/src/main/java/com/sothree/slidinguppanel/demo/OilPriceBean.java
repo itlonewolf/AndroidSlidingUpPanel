@@ -9,6 +9,9 @@ import android.text.TextPaint;
 
 /**
  * 油价
+ *
+ * @author zhaozy
+ * @date 2017/11/17
  */
 
 public class OilPriceBean extends ARefreshable {
