@@ -1,7 +1,6 @@
 package com.sothree.slidinguppanel.demo;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.widget.FrameLayout;
@@ -24,19 +23,19 @@ public class SimpleSlideableActivity extends AppCompatActivity {
         demoCase();
     
         mAssembleView.setClickable(true);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                refreshTitle();
-            }
-        }, 5000);
-    
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mAssembleView.requestLayout();
-            }
-        }, 10000);
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                refreshTitle();
+//            }
+//        }, 5000);
+
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                mAssembleView.requestLayout();
+//            }
+//        }, 10000);
     }
     
     public void refreshTitle() {

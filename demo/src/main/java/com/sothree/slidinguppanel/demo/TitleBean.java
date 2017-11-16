@@ -4,7 +4,6 @@ import android.graphics.*;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.text.TextUtils;
-import android.widget.Toast;
 
 /**
  * 第一部分
@@ -193,7 +192,7 @@ public class TitleBean extends ARefreshable {
     
     @Override
     public void onClick() {
-        Toast.makeText(GlobalUtil.getContext(), "点击了 title bean", Toast.LENGTH_SHORT).show();
+        refresh();
     }
     
     @Override
