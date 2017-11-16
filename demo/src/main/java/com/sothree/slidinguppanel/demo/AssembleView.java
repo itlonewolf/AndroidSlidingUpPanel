@@ -1,5 +1,6 @@
 package com.sothree.slidinguppanel.demo;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -64,6 +65,8 @@ public class AssembleView extends View {
         }
     };
     
+    //idea 由内部自己实现了点击操作,所以不用再覆写 performClick 方法
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         
