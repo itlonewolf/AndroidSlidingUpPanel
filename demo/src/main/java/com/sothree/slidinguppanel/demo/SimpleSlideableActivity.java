@@ -48,6 +48,9 @@ public class SimpleSlideableActivity extends AppCompatActivity {
     
         refreshTitle = TitleBean.demoBean(dm.widthPixels);
         ARefreshable   distanceBean = DistanceBean.demoBean(dm.widthPixels);
-        mAssembleView.addItems(refreshTitle, distanceBean);
+        ARefreshable   oilPriceBean = OilPriceBean.demoBean(dm.widthPixels);
+        ARefreshable   parkingBean = ParkingBean.demoBean(dm.widthPixels);
+        ARefreshable   rechargeInfoBean = ChargeSituationBean.demoBean(dm.widthPixels);
+        mAssembleView.addItems(refreshTitle,distanceBean,rechargeInfoBean,oilPriceBean,parkingBean);
     }
 }
