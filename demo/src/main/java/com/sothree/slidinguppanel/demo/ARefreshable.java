@@ -1,20 +1,19 @@
 package com.sothree.slidinguppanel.demo;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Rect;
-import android.view.View;
 
 /**
  * Created by xiaoyee on 2017/11/14.
  * 可以刷新的 bean
  */
 
-public abstract class ARefreshable {
+public abstract class ARefreshable implements IInteractive {
     IRefreshListener mRefreshListener;
     Rect mContentBound = new Rect();
-    private View.OnClickListener mOnClickListener;
-    private boolean mIsClickable = false;
-    private int id;
+    private int     id;
+    private boolean isPressing;
     
     public ARefreshable() {
         id = System.identityHashCode(this);
@@ -22,24 +21,6 @@ public abstract class ARefreshable {
     
     public int getId() {
         return id;
-    }
-    
-    public void setOnClickListener(View.OnClickListener listener) {
-        this.mOnClickListener = listener;
-        mIsClickable = true;
-    }
-    
-    public void removeOnClickListener() {
-        this.mOnClickListener = null;
-        mIsClickable = false;
-    }
-    
-    public boolean isClickable() {
-        return mIsClickable;
-    }
-    
-    public View.OnClickListener getOnClickListener() {
-        return mOnClickListener;
     }
     
     public void addRefreshListener(IRefreshListener listener) {
@@ -56,7 +37,11 @@ public abstract class ARefreshable {
     
     public final void drawContent(Canvas canvas) {
         //idea save 和 restore 的使用是防止在本组件中做的变换影响到其他组件
+    
+        //step 首先绘制点击区域
+        drawPressingBounds(canvas);
         final int saveFlag = canvas.save();
+        //step 然后再绘制内容区域
         drawContentInner(canvas);
         canvas.restoreToCount(saveFlag);
     }
@@ -82,5 +67,42 @@ public abstract class ARefreshable {
         mContentBound.set(left, top, left + width, top + height);
     }
     
+    @Override
+    public void onClick() {
+        //do nothing
+    }
+    
+    @Override
+    public boolean isClickable() {
+        return false;
+    }
+    
+    public void setPressed(boolean isPressing) {
+        this.isPressing = isPressing;
+    }
+    
+    @Override
+    public boolean isPressing() {
+        return isPressing;
+    }
+    
+    @Override
+    public int pressingColor() {
+        return Color.LTGRAY;
+    }
+    
     protected abstract void drawContentInner(Canvas canvas);
+    
+    protected Rect getPressingBounds() {
+        return mContentBound;
+    }
+    
+    protected void drawPressingBounds(Canvas canvas) {
+        if (isPressing()) {
+            final int saveFlag = canvas.save();
+            canvas.clipRect(getPressingBounds());
+            canvas.drawColor(pressingColor());
+            canvas.restoreToCount(saveFlag);
+        }
+    }
 }

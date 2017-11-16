@@ -1,12 +1,10 @@
 package com.sothree.slidinguppanel.demo;
 
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.graphics.*;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 /**
  * 第一部分
@@ -56,7 +54,6 @@ public class TitleBean extends ARefreshable {
     
     private TextPaint textPaint;
     
-    
     public TitleBean(int width) {
         this.width = width;
     }
@@ -89,6 +86,15 @@ public class TitleBean extends ARefreshable {
     
     @Override
     public void initAssemble() {
+    
+        // ▼ //demo xiaoyee ▼
+    
+        mLinePaint = new Paint();
+        mLinePaint.setColor(Color.BLACK);
+        mLinePaint.setStrokeWidth(1);
+        // ▲ //demo xiaoyee ▲
+        
+        
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
     
         mNameTextPoint = new Point();
@@ -125,7 +131,7 @@ public class TitleBean extends ARefreshable {
     @NonNull
     private TextArtist.TextArtistSetting getDIstanceTextArtistSetting(TextPaint textPaint) {
         TextArtist.TextArtistSetting priceArtistSetting = new TextArtist.TextArtistSetting(textPaint);
-        priceArtistSetting.setAlign(TextArtist.ALIGN_LC);
+        priceArtistSetting.setAlign(TextArtist.ALIGN_LT);
         priceArtistSetting.appendImage(R.drawable.star_1);
         priceArtistSetting.appendImage(R.drawable.star_1);
         priceArtistSetting.appendImage(R.drawable.star_1);
@@ -141,7 +147,7 @@ public class TitleBean extends ARefreshable {
     @NonNull
     private TextArtist.TextArtistSetting getNameTextArtistSetting(TextPaint textPaint) {
         TextArtist.TextArtistSetting nameArtistSetting = new TextArtist.TextArtistSetting(textPaint);
-        nameArtistSetting.setAlign(TextArtist.ALIGN_LC);
+        nameArtistSetting.setAlign(TextArtist.ALIGN_LT);
         nameArtistSetting.append(name).absoluteSize(SP18);
         if (!TextUtils.isEmpty(poiLoc)) {
             nameArtistSetting.append(poiLoc).absoluteSize(SP14);
@@ -159,6 +165,7 @@ public class TitleBean extends ARefreshable {
     public void drawContentInner(Canvas canvas) {
         //step 1、先将画布移动到对应位置
         canvas.translate(DP30, DP15);
+    
         int left = mContentBound.left;
         int top  = mContentBound.top;
     
@@ -173,6 +180,24 @@ public class TitleBean extends ARefreshable {
         mPriceTextPoint.set(left, priceTextHeight / 2 + top);
         mPriceTextArtist.setAlignReferencePoint(mPriceTextPoint);
         mPriceTextArtist.draw(canvas);
+    
+        // ▼ //demo xiaoyee ▼
+        mLinePaint.setTextSize(40);
+        mLinePaint.setColor(Color.RED);
+        mLinePaint.setStrokeWidth(3);
+//        canvas.drawText(String.format("w:%s X h:%s", mContentBound.width(), mContentBound.height()), left, top, mLinePaint);
+        // ▲ //demo xiaoyee ▲
     }
     
+    Paint mLinePaint;
+    
+    @Override
+    public void onClick() {
+        Toast.makeText(GlobalUtil.getContext(), "点击了 title bean", Toast.LENGTH_SHORT).show();
+    }
+    
+    @Override
+    public boolean isClickable() {
+        return true;
+    }
 }

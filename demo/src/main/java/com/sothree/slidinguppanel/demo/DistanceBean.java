@@ -2,7 +2,6 @@ package com.sothree.slidinguppanel.demo;
 
 import android.graphics.*;
 import android.text.TextPaint;
-import android.view.View;
 
 /**
  * Created by xiaoyee on 2017/11/14.
@@ -24,6 +23,7 @@ public class DistanceBean extends ARefreshable {
     
     private int SP16 = LayoutUtils.getPxByDimens(R.dimen.sp16);
     private int DP16 = LayoutUtils.getPxByDimens(R.dimen.dp16);
+    private int DP18 = LayoutUtils.getPxByDimens(R.dimen.dp18);
     private int DP20 = LayoutUtils.getPxByDimens(R.dimen.dp20);
     private int DP44 = LayoutUtils.getPxByDimens(R.dimen.dp44);
     
@@ -33,14 +33,8 @@ public class DistanceBean extends ARefreshable {
     
     public static DistanceBean demoBean(int width) {
         final DistanceBean distanceBean = new DistanceBean(width);
-        distanceBean.time = "正在计算...";
+        distanceBean.time = "agfpqdt";
         distanceBean.distance = "60公里";
-        distanceBean.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                distanceBean.refresh();
-            }
-        });
         return distanceBean;
     }
     
@@ -65,7 +59,8 @@ public class DistanceBean extends ARefreshable {
         textPaint = new TextPaint();
         TextArtist.TextArtistSetting priceArtistSetting = new TextArtist.TextArtistSetting(textPaint);
         priceArtistSetting.setAlign(TextArtist.ALIGN_CC);
-        priceArtistSetting.appendImageWithHeight(R.drawable.car, DP20);
+        priceArtistSetting.appendImageWithHeight(R.drawable.car, DP18);
+//        priceArtistSetting.appendImageWithHeight(R.drawable.rectangle, DP18);
         priceArtistSetting.append(String.format("  %s  %s", time, distance)).absoluteSize(SP16);
         
         priceArtistSetting.setMaxLineCount(1);

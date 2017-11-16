@@ -19,6 +19,10 @@ public class GlobalUtil {
         return context.getResources();
     }
     
+    public static void setContext(Context contextLocal) {
+        context = contextLocal;
+    }
+    
     public static Activity getMainActivity() {
         return mainActivity;
     }

@@ -27,5 +27,7 @@ public class DemoApp extends Application {
         catch (IOException e) {
             e.printStackTrace();
         }
+    
+        GlobalUtil.setContext(getApplicationContext());
     }
 }

@@ -8,10 +8,13 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.SparseArray;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * custom view
@@ -24,7 +27,7 @@ public class AssembleView extends View {
     /**
      * 需要绘制的组件的集合
      */
-    private ArrayList<ARefreshable> mRefreshables;
+    private TreeMap<Integer, ARefreshable> mRefreshables;
     
     /**
      * 所有可以点击或者触摸有效果的组件区域集合;
@@ -40,6 +43,86 @@ public class AssembleView extends View {
     private Region            mTouchableRegion;
     
     Rect mClipBounds;
+    
+    private float mInitialMotionX;
+    private float mInitialMotionY;
+    
+    private GestureDetector mGestureDetector;
+    private GestureDetector.OnGestureListener mGestureListener = new GestureDetector.SimpleOnGestureListener() {
+        @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+            if (pressingItem != null) {
+                pressingItem.onClick();
+                return true;
+            }
+            return super.onSingleTapConfirmed(e);
+        }
+        
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
+    };
+    
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        
+        final int x = (int) event.getX();
+        final int y = (int) event.getY();
+        
+        final int action = event.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                mInitialMotionX = x;
+                mInitialMotionY = y;
+                pressingItem = null;
+                //step 1、先判断
+                if (mTouchableRegion.contains(x, y)) {
+                    final int boundsSize = mTouchableBounds.size();
+                    for (int i = 0; i < boundsSize; i++) {
+                        Rect bounds = mTouchableBounds.valueAt(i);
+                        if (bounds.contains(x, y)) {
+                            final int          touchIndex = mTouchableBounds.keyAt(i);
+                            final ARefreshable item       = mRefreshables.get(touchIndex);
+                            item.setPressed(true);
+                            pressingItem = item;
+                            invalidate(item.getBounds());
+                            break;
+                        }
+                    }
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                final ViewConfiguration vc = ViewConfiguration.get(GlobalUtil.getContext());
+                final int touchSlop = vc.getScaledTouchSlop();
+                final float adx = Math.abs(x - mInitialMotionX);
+                final float ady = Math.abs(y - mInitialMotionY);
+                //idea 在"滑动阈值"以内的也算是滑动
+                final boolean underDragSlop = ady <= touchSlop && adx <= touchSlop;
+                if (!underDragSlop) {
+                    resetPressingItem();
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                resetPressingItem();
+                break;
+            case MotionEvent.ACTION_UP:
+                resetPressingItem();
+                break;
+        }
+        
+        return mGestureDetector.onTouchEvent(event);
+    }
+    
+    
+    private ARefreshable pressingItem = null;
+    
+    private void resetPressingItem() {
+        if (pressingItem != null) {
+            pressingItem.setPressed(false);
+            invalidate(pressingItem.getBounds());
+        }
+    }
     
     private IRefreshListener mRefreshListener = new IRefreshListener() {
         @Override
@@ -59,11 +142,13 @@ public class AssembleView extends View {
     }
     
     private void initVariable() {
-        mRefreshables = new ArrayList<>();
+        mRefreshables = new TreeMap<>();
         mTouchableBounds = new SparseArray<>();
         mTouchableRegion = new Region();
         
         mClipBounds = new Rect();
+    
+        mGestureDetector = new GestureDetector(mGestureListener);
     }
     
     public void addRefreshableItem(ARefreshable item) {
@@ -76,17 +161,17 @@ public class AssembleView extends View {
         item.addRefreshListener(mRefreshListener);
         
         if (position == UNSET_POSTION) {
-            mRefreshables.add(item);
+            mRefreshables.put(item.getId(), item);
             return;
         }
         
         final int size = mRefreshables.size();
         if (position >= size || position < 0) {
-            mRefreshables.add(item);
+            mRefreshables.put(item.getId(), item);
             return;
         }
-        
-        mRefreshables.add(position, item);
+    
+        mRefreshables.put(item.getId(), item);
         // FIXME: 2017/11/15 判断是否需要 requestLayout
     }
     
@@ -104,12 +189,7 @@ public class AssembleView extends View {
         for (ARefreshable refreshable : items) {
             addRefreshableItem(refreshable);
         }
-    }
-    
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        
-        return super.onTouchEvent(event);
+        requestLayout();
     }
     
     @Override
@@ -121,14 +201,14 @@ public class AssembleView extends View {
         if (hasClipBounds) {
             canvas.clipRect(mClipBounds);
     
-            for (ARefreshable refreshable : mRefreshables) {
+            for (ARefreshable refreshable : mRefreshables.values()) {
                 if (Rect.intersects(refreshable.getBounds(), mClipBounds)) {
                     refreshable.drawContent(canvas);
                 }
             }
         } else {
             Log.d("AssembleDraw", String.format("没有 clip bounds: %s", mClipBounds));
-            for (ARefreshable refreshable : mRefreshables) {
+            for (ARefreshable refreshable : mRefreshables.values()) {
                 refreshable.drawContent(canvas);
             }
         }
@@ -141,7 +221,7 @@ public class AssembleView extends View {
         int width  = MeasureSpec.getSize(widthMeasureSpec);
     
         int height = 0;
-        for (ARefreshable refreshable : mRefreshables) {
+        for (ARefreshable refreshable : mRefreshables.values()) {
             height += refreshable.height();
         }
         
@@ -155,10 +235,12 @@ public class AssembleView extends View {
         int leftPos = 0;
         int topPos  = 0;
     
-        for (ARefreshable refreshable : mRefreshables) {
+        for (ARefreshable refreshable : mRefreshables.values()) {
             refreshable.updatePosition(leftPos, topPos);
-            mTouchableBounds.put(refreshable.getId(), refreshable.getBounds());
-            mTouchableRegion.union(refreshable.getBounds());
+            if (refreshable.isClickable()) {
+                mTouchableBounds.put(refreshable.getId(), refreshable.getBounds());
+                mTouchableRegion.union(refreshable.getBounds());
+            }
             topPos += refreshable.height();
         }
     }
