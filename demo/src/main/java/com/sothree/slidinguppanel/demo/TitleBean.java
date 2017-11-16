@@ -4,6 +4,7 @@ import android.graphics.*;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 import android.text.TextUtils;
+import android.util.Log;
 
 /**
  * 第一部分
@@ -163,10 +164,10 @@ public class TitleBean extends ARefreshable {
     public void drawContentInner(Canvas canvas) {
         //step 1、先将画布移动到对应位置
         canvas.translate(DP30, DP15);
-    
+
         int left = mContentBound.left;
         int top  = mContentBound.top;
-    
+
         //step 2、再绘制
         //step 2.1、先绘制 name
         mNameTextPoint.set(left, nameTextHeight / 2 + top);

@@ -3,6 +3,7 @@ package com.sothree.slidinguppanel.demo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.util.DisplayMetrics;
 
 /**
  * Created by xiaoyee on 2017/11/14.
@@ -14,9 +15,11 @@ public abstract class ARefreshable implements IInteractive {
     Rect mContentBound = new Rect();
     private int     id;
     private boolean isPressing;
-    
+    protected int screenWidth;//屏幕宽度（）
     public ARefreshable() {
         id = System.identityHashCode(this);
+        DisplayMetrics dm = GlobalUtil.getResources().getDisplayMetrics();
+        screenWidth = dm.widthPixels;
     }
     
     /**

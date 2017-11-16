@@ -1,2 +1,2 @@
-include ':library', ':aModule'
+include ':library'
 include ':demo'
