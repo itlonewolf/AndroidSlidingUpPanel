@@ -11,7 +11,7 @@ public class SimpleSlideableActivity extends AppCompatActivity {
     AssembleView mAssembleView;
 //    Button btnInvalidate;
     
-    TitleBean refreshTitle;
+    TitleUnit refreshTitle;
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,5 +53,7 @@ public class SimpleSlideableActivity extends AppCompatActivity {
         ARefreshable   landUnit = PoisummaryUnit.demoBean(dm.widthPixels);
         ARefreshable   rechargeInfoBean = ChargeSituationUnit.demoBean(dm.widthPixels);
         mAssembleView.addItems(oilPriceBean);
+        refreshTitle = TitleBean.TitleUnit.demoBean(dm.widthPixels);
+//        mAssembleView.addItems(refreshTitle, distanceBean, distanceBean2);
     }
 }

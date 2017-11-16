@@ -10,70 +10,70 @@ import android.util.Log;
  * 第一部分
  */
 
-public class TitleBean extends ARefreshable {
-
+public class TitleUnit extends ARefreshable {
+    
     /**
      * POI名称
      */
-
+    
     private String name;
-
+    
     private String poiLoc;
-
+    
     /**
      * 类型名称
      */
     private String typeName;
-
+    
     /**
      * 星级
      */
     private String rank;
-
+    
     private float price;
-
+    
     private int SP18 = LayoutUtils.getPxByDimens(R.dimen.F4);
     private int SP14 = LayoutUtils.getPxByDimens(R.dimen.F2);
-
+    
     private int DP110 = LayoutUtils.getPxByDimens(R.dimen.dp110);
     private int DP60  = LayoutUtils.getPxByDimens(R.dimen.dp60);
     private int DP30  = LayoutUtils.getPxByDimens(R.dimen.dp30);
     private int DP15  = LayoutUtils.getPxByDimens(R.dimen.dp15);
     private int DP5   = LayoutUtils.getPxByDimens(R.dimen.dp5);
-
+    
     private final int width;//文本的宽度
     private       int height;//文本的高度
-
+    
     private TextArtist mNameTextArtist;
     private Point      mNameTextPoint;
     private int        nameTextHeight;
-
+    
     private TextArtist mPriceTextArtist;
     private Point      mPriceTextPoint;
     private int        priceTextHeight;
-
+    
     private TextPaint textPaint;
-
-    public TitleBean(int width) {
+    
+    public TitleUnit(int width) {
         this.width = width;
     }
-
-    public static TitleBean demoBean(int width) {
-        TitleBean bean = new TitleBean(width);
+    
+    public static TitleUnit demoBean(int width) {
+        TitleUnit bean = new TitleUnit(width);
         bean.name = "正在逆地理";
         bean.price = 0;
         bean.typeName = "XX  XXX";
         return bean;
     }
-
+    
     public void refresh() {
         this.name = "串亭烧烤居酒屋(东直门店)";
         this.price = 66;
         this.typeName = "川菜  中餐馆";
-
+        
         TextArtist.TextArtistSetting nameArtistSetting = getNameTextArtistSetting(textPaint);
         mNameTextArtist = new TextArtist(nameArtistSetting);
-
+        
         TextArtist.TextArtistSetting priceArtistSetting = getDIstanceTextArtistSetting(textPaint);
         mPriceTextArtist = new TextArtist(priceArtistSetting);
 

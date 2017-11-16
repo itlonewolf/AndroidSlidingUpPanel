@@ -2,14 +2,11 @@ package com.sothree.slidinguppanel.demo;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.text.method.LinkMovementMethod;
+import android.util.DisplayMetrics;
 import android.view.*;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -30,7 +27,9 @@ public class DemoActivity extends AppCompatActivity {
     private RecyclerView mRecyclerView;
     private GalleryAdapter mAdapter;
     private List<Integer> mDatas;
+    AssembleView mAssembleView;
     
+    TitleUnit refreshTitle;
 //    private View leadingView;
 
 //    private View viewWaiting2Show;
@@ -108,64 +107,81 @@ public class DemoActivity extends AppCompatActivity {
 //        lv.setAdapter(arrayAdapter);
 
         mLayout = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
-        btnInCollapsed = (Button) findViewById(R.id.btnInCollapsed);
-        btnInCollapsed.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(DemoActivity.this, ConstraintActivity.class));
-//                Toast.makeText(getApplicationContext(), "btnInCollapsed", Toast.LENGTH_SHORT).show();
-//                mLayout.demoListener();
-            }
-        });
-//        leadingView = findViewById(R.id.collapsed_view);
-//        viewWaiting2Show = findViewById(R.id.sliding_view);
+
+//        mAssembleView = new AssembleView(this);
+        mAssembleView = (AssembleView) findViewById(R.id.assembleView);
+        demoCase();
+        
 //
-//        mLayout.addPanelSlideListener(new PanelSlideListener() {
+//
+//        btnInCollapsed = (Button) findViewById(R.id.btnInCollapsed);
+//        btnInCollapsed.setOnClickListener(new OnClickListener() {
 //            @Override
-//            public void onPanelSlide(View panel, float slideOffset) {
-//                if (slideOffset > 0) {
-//                    if (leadingView.getVisibility() != View.INVISIBLE) {
-//                        leadingView.setVisibility(View.INVISIBLE);
-//                        viewWaiting2Show.setVisibility(View.VISIBLE);
-//                        mLayout.requestLayout();
-//                    }
-//                } else {
-//                    if (leadingView.getVisibility() != View.VISIBLE) {
-//                        leadingView.setVisibility(View.VISIBLE);
-//                        viewWaiting2Show.setVisibility(View.INVISIBLE);
-//                        mLayout.requestLayout();
-//                    }
-//                }
-//
-//            }
-//
-//            @Override
-//            public void onPanelStateChanged(View panel, PanelState previousState, PanelState newState) {
-//
+//            public void onClick(View v) {
+//                startActivity(new Intent(DemoActivity.this, ConstraintActivity.class));
+////                Toast.makeText(getApplicationContext(), "btnInCollapsed", Toast.LENGTH_SHORT).show();
+////                mLayout.demoListener();
 //            }
 //        });
+////        leadingView = findViewById(R.id.collapsed_view);
+////        viewWaiting2Show = findViewById(R.id.sliding_view);
+////
+////        mLayout.addPanelSlideListener(new PanelSlideListener() {
+////            @Override
+////            public void onPanelSlide(View panel, float slideOffset) {
+////                if (slideOffset > 0) {
+////                    if (leadingView.getVisibility() != View.INVISIBLE) {
+////                        leadingView.setVisibility(View.INVISIBLE);
+////                        viewWaiting2Show.setVisibility(View.VISIBLE);
+////                        mLayout.requestLayout();
+////                    }
+////                } else {
+////                    if (leadingView.getVisibility() != View.VISIBLE) {
+////                        leadingView.setVisibility(View.VISIBLE);
+////                        viewWaiting2Show.setVisibility(View.INVISIBLE);
+////                        mLayout.requestLayout();
+////                    }
+////                }
+////
+////            }
+////
+////            @Override
+////            public void onPanelStateChanged(View panel, PanelState previousState, PanelState newState) {
+////
+////            }
+////        });
+//
+//        mLayout.setAnchorPoint(0.7f);
+//        mLayout.setFadeOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                mLayout.setPanelState(PanelState.COLLAPSED);
+//            }
+//        });
+//
+//        TextView t = (TextView) findViewById(R.id.name);
+//        t.setText(Html.fromHtml(getString(R.string.hello)));
+//        Button f = (Button) findViewById(R.id.follow);
+//        f.setText(Html.fromHtml(getString(R.string.follow)));
+//        f.setMovementMethod(LinkMovementMethod.getInstance());
+//        f.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent i = new Intent(Intent.ACTION_VIEW);
+//                i.setData(Uri.parse("http://www.twitter.com/umanoapp"));
+//                startActivity(i);
+//            }
+//        });
+    }
     
-        mLayout.setAnchorPoint(0.7f);
-        mLayout.setFadeOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mLayout.setPanelState(PanelState.COLLAPSED);
-            }
-        });
-
-        TextView t = (TextView) findViewById(R.id.name);
-        t.setText(Html.fromHtml(getString(R.string.hello)));
-        Button f = (Button) findViewById(R.id.follow);
-        f.setText(Html.fromHtml(getString(R.string.follow)));
-        f.setMovementMethod(LinkMovementMethod.getInstance());
-        f.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent i = new Intent(Intent.ACTION_VIEW);
-                i.setData(Uri.parse("http://www.twitter.com/umanoapp"));
-                startActivity(i);
-            }
-        });
+    public void demoCase() {
+        DisplayMetrics dm = GlobalUtil.getResources().getDisplayMetrics();
+        
+        refreshTitle = TitleUnit.demoBean(dm.widthPixels);
+        ARefreshable distanceBean  = DistanceUnit.demoBean(dm.widthPixels);
+        ARefreshable distanceBean2 = DistanceUnit.demoBean(dm.widthPixels);
+        mAssembleView.addItems(distanceBean2, refreshTitle, distanceBean);
+//        mAssembleView.addItems(refreshTitle, distanceBean, distanceBean2);
     }
     
     public void btnFloat(View view) {

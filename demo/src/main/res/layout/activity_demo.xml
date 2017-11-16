@@ -7,22 +7,29 @@
         sothree:umanoPanelHeight="68dp"
         sothree:umanoShadowHeight="4dp"
 
-        sothree:umanoExpandedStateTop="60dp"
         sothree:umanoScrollableView="@+id/sv"
-        sothree:umanoCollapsedView="@+id/collapsed_view"
 
         sothree:umanoParallaxView="@+id/main_toolbar"
         sothree:umanoMainView="@+id/main_view"
         sothree:umanoSlideableView="@+id/sliding_view"
+
+        sothree:umanoCollapsedView="@+id/assembleView"
 >
 
+    <!--sothree:umanoCollapsedView="@+id/collapsed_view"-->
     <!-- MAIN CONTENT -->
     <include layout="@layout/title_lay"/>
 
     <!-- SLIDING LAYOUT -->
     <include layout="@layout/content_layout"/>
 
+    <com.sothree.slidinguppanel.demo.AssembleView
+            android:id="@+id/assembleView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+    />
+
     <!--COLLAPSED VIEW-->
-    <include layout="@layout/collapsed_view_lay"/>
+    <!--<include layout="@layout/collapsed_view_lay"/>-->
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>
