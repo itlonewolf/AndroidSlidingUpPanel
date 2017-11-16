@@ -82,7 +82,6 @@ public class TitleBean extends ARefreshable {
         }
     }
     
-    
     @Override
     public void initAssemble() {
     
@@ -196,7 +195,7 @@ public class TitleBean extends ARefreshable {
     }
     
     @Override
-    public boolean isClickable() {
+    public boolean isInteractive() {
         return true;
     }
 }

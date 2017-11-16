@@ -48,6 +48,6 @@ public class SimpleSlideableActivity extends AppCompatActivity {
     
         refreshTitle = TitleBean.demoBean(dm.widthPixels);
         ARefreshable   distanceBean = DistanceBean.demoBean(dm.widthPixels);
-        mAssembleView.addRefreshableItem(refreshTitle, distanceBean);
+        mAssembleView.addItems(refreshTitle, distanceBean);
     }
 }
