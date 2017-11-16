@@ -79,8 +79,10 @@ public class AssembleView extends View {
                 mInitialMotionX = x;
                 mInitialMotionY = y;
                 pressingItem = null;
-                //step 1、先判断
+    
+                //step 1、先判断整个可点击区域中是否包含此触摸点
                 if (mTouchableRegion.contains(x, y)) {
+                    //step 2、如果包含,那么就要遍历出到底是哪个"可点击区域"被点中了
                     final int boundsSize = mTouchableBounds.size();
                     for (int i = 0; i < boundsSize; i++) {
                         Rect bounds = mTouchableBounds.valueAt(i);
@@ -90,9 +92,13 @@ public class AssembleView extends View {
                             item.setPressed(true);
                             pressingItem = item;
                             invalidate(item.getBounds());
+                            //idea 找到之后就停止遍历
+                            Log.d("AssembleViewDraw", String.format("pressing bounds:%s, we need refresh this area", item.getBounds()));
                             break;
                         }
                     }
+                } else {
+                    //不包含的话 do nothing
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -203,6 +209,7 @@ public class AssembleView extends View {
         
         if (hasClipBounds) {
             canvas.clipRect(mClipBounds);
+            Log.d("AssembleViewDraw", String.format("有裁切区域,且裁切区域为:%s", mClipBounds));
     
             for (ARefreshable refreshable : mRefreshables.values()) {
                 if (Rect.intersects(refreshable.getBounds(), mClipBounds)) {
