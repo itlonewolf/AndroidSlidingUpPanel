@@ -13,7 +13,7 @@ import android.util.Log;
  */
 
 public class RecommendationBean extends ARefreshable {
-    Paint mLinePaint;
+    private  Paint mLinePaint;
     private final int width;//文本的宽度
     private int height;//文本的高度
 
