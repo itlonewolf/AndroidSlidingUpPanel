@@ -39,12 +39,12 @@ public class DistanceBean extends ARefreshable {
         return distanceBean;
     }
 
-    public void refresh() {
-        this.time = "1小时 30分钟";
-        if (mRefreshListener != null) {
-            mRefreshListener.onRefresh(mContentBound);
-        }
-    }
+//    public void refresh() {
+//        this.time = "1小时 30分钟";
+//        if (mRefreshListener != null) {
+//            mRefreshListener.onRefresh(getBoundsInner());
+//        }
+//    }
 
     @Override
     public void initAssemble() {
@@ -56,7 +56,6 @@ public class DistanceBean extends ARefreshable {
 
         mCarTextPoint = new Point();
 
-        mContentBound = new Rect();
         textPaint = new TextPaint();
         TextArtist.TextArtistSetting priceArtistSetting = new TextArtist.TextArtistSetting(textPaint);
         priceArtistSetting.setAlign(TextArtist.ALIGN_CC);
@@ -70,31 +69,33 @@ public class DistanceBean extends ARefreshable {
 
         height = DP44;
         updateBoundsInner(width, height);
-        Log.d("zzz", "distance--mContentBound1" + mContentBound);
     }
 
     @Override
     public int height() {
-        return height;
+        return 0;
     }
 
     @Override
     public int width() {
-        return width;
+        return 0;
     }
+
 
     @Override
     public void drawContentInner(Canvas canvas) {
-        Log.d("zzz", "distance--mContentBound2" + mContentBound);
+
         int left = mContentBound.left;
+
         int top = mContentBound.top;
         int right = mContentBound.right;
         int bottom = mContentBound.bottom;
 
+
         canvas.drawLine(left, top, right, top, mLinePaint);
         canvas.drawLine(left, bottom - 2, right, bottom - 2, mLinePaint);
 
-        mCarTextPoint.set(mContentBound.width() / 2, mContentBound.height() / 2 + top);
+        mCarTextPoint.set(right / 2, bottom / 2 + top);
         mCarTextArtist.setAlignReferencePoint(mCarTextPoint);
         mCarTextArtist.draw(canvas);
     }

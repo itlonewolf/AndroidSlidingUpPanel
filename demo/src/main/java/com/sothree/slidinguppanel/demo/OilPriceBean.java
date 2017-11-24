@@ -3,9 +3,13 @@ package com.sothree.slidinguppanel.demo;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
+import android.text.TextUtils;
+import android.util.Log;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 油价
@@ -35,10 +39,9 @@ public class OilPriceBean extends ARefreshable {
 
     private TextArtist mNameTextArtist;
     private TextArtist mNoteTextArtist;
-    private TextArtist mTypeTextArtist;
-    private TextArtist mPriceTextArtist;
     private int SP14 = LayoutUtils.getPxByDimens(R.dimen.F2);
     private int DP36 = LayoutUtils.getPxByDimens(R.dimen.dp36);
+    private int DP5 = LayoutUtils.getPxByDimens(R.dimen.dp5);
     private int DP15 = LayoutUtils.getPxByDimens(R.dimen.dp15);
     private int DP7 = LayoutUtils.getPxByDimens(R.dimen.dp7);
     private int DP10 = LayoutUtils.getPxByDimens(R.dimen.dp10);
@@ -47,7 +50,10 @@ public class OilPriceBean extends ARefreshable {
     private Point mTypeTextPoint;
     private Point mPriceTextPoint;
     private Point mNoteTextPoint;
-    private int mDescTextHeight;
+    private List<String> parseOilTypeList = new ArrayList<>();
+    private List<String> parseOilPriceList = new ArrayList<>();
+    private List<TextArtist> typeArtistList = new ArrayList<>();
+    private List<TextArtist> priceArtistList = new ArrayList<>();
 
     public OilPriceBean(int width) {
         this.width = width - DP15;
@@ -57,13 +63,28 @@ public class OilPriceBean extends ARefreshable {
         OilPriceBean bean = new OilPriceBean(width);
         bean.title = "油价";
         bean.note = "仅供参考,请以实地为准";
-        bean.oilType = "92#汽油";
-        bean.oilPrice = "6.2/升";
+        bean.oilPrice = "92:6.78,95:7.22,98:暂无";
         return bean;
     }
 
     @Override
-    void initAssemble() {
+    protected void initAssemble() {
+
+
+        if (!TextUtils.isEmpty(oilPrice)) {
+            String[] parseOilArray = oilPrice.split(",");
+
+            for (int i = 0; i < parseOilArray.length; i++) {
+                String item = parseOilArray[i];
+                String[] strings = item.split(":");
+                parseOilTypeList.add(strings[0]);
+                parseOilPriceList.add(strings[1]);
+
+
+            }
+
+        }
+
 
         mLinePaint = new Paint();
 
@@ -72,7 +93,6 @@ public class OilPriceBean extends ARefreshable {
         mTypeTextPoint = new Point();
         mPriceTextPoint = new Point();
         mNoteTextPoint = new Point();
-        mContentBound = new Rect();
 
         TextArtist.TextArtistSetting nameArtistSetting = getTitleTextArtistSetting(textPaint);
         mNameTextArtist = new TextArtist(nameArtistSetting);
@@ -80,19 +100,49 @@ public class OilPriceBean extends ARefreshable {
         TextArtist.TextArtistSetting noteArtistSetting = getNoteTextArtistSetting(textPaint);
         mNoteTextArtist = new TextArtist(noteArtistSetting);
 
-        TextArtist.TextArtistSetting descArtistSetting = getTypeTextArtistSetting(textPaint);
-        mTypeTextArtist = new TextArtist(descArtistSetting);
+        for (int i = 0; i < parseOilTypeList.size(); i++) {
+            TextArtist.TextArtistSetting descArtistSetting = getTypeTextArtistSetting(textPaint, parseOilTypeList.get(i) + "#汽油");
+            TextArtist mTypeTextArtist = new TextArtist(descArtistSetting);
+            typeArtistList.add(mTypeTextArtist);
 
-        TextArtist.TextArtistSetting priceArtistSetting = getPriceTextArtistSetting(textPaint);
-        mPriceTextArtist = new TextArtist(priceArtistSetting);
+
+            TextArtist.TextArtistSetting priceArtistSetting = getPriceTextArtistSetting(textPaint, parseOilPriceList.get(i) + "元/升");
+            TextArtist mPriceTextArtist = new TextArtist(priceArtistSetting);
+            priceArtistList.add(mPriceTextArtist);
+
+        }
+
 
         updateSize();
     }
 
 
+    @Override
+    public int height() {
+        return width;
+    }
+
+    @Override
+    public int width() {
+        return height;
+    }
+
+
     private void updateSize() {
-        mDescTextHeight = mTypeTextArtist.getHeight();
-        height = DP36 + DP10 * 2 + mDescTextHeight;
+
+        int itemHeight = 0;
+        if (priceArtistList == null && priceArtistList.size() > 0) {
+            for (int i = 0; i < priceArtistList.size(); i++) {
+                int height = priceArtistList.get(i).getHeight();
+
+                itemHeight += height + DP5;
+
+            }
+
+        }
+
+
+        height = DP36  + itemHeight;
         updateBoundsInner(width, height);
     }
 
@@ -117,7 +167,7 @@ public class OilPriceBean extends ARefreshable {
     }
 
     @NonNull
-    private TextArtist.TextArtistSetting getTypeTextArtistSetting(TextPaint textPaint) {
+    private TextArtist.TextArtistSetting getTypeTextArtistSetting(TextPaint textPaint, String oilType) {
         TextArtist.TextArtistSetting priceArtistSetting = new TextArtist.TextArtistSetting(textPaint);
         priceArtistSetting.setAlign(TextArtist.ALIGN_LC);
         priceArtistSetting.append(oilType).absoluteSize(SP14).color(GlobalUtil.getContext().getResources().getColor(R.color.FC23));
@@ -127,7 +177,7 @@ public class OilPriceBean extends ARefreshable {
     }
 
     @NonNull
-    private TextArtist.TextArtistSetting getPriceTextArtistSetting(TextPaint textPaint) {
+    private TextArtist.TextArtistSetting getPriceTextArtistSetting(TextPaint textPaint, String oilPrice) {
         TextArtist.TextArtistSetting priceArtistSetting = new TextArtist.TextArtistSetting(textPaint);
         priceArtistSetting.setAlign(TextArtist.ALIGN_RC);
         priceArtistSetting.append(oilPrice).absoluteSize(SP14).color(GlobalUtil.getContext().getResources().getColor(R.color.FC23));
@@ -136,17 +186,6 @@ public class OilPriceBean extends ARefreshable {
         return priceArtistSetting;
     }
 
-
-
-    @Override
-    public int height() {
-        return height;
-    }
-
-    @Override
-    public int width() {
-        return width;
-    }
 
     @Override
     protected void drawContentInner(Canvas canvas) {
@@ -176,18 +215,26 @@ public class OilPriceBean extends ARefreshable {
         mLinePaint.setStrokeWidth(2);
         int mLineY = top + DP36;
         canvas.drawLine(left, mLineY, width, mLineY, mLinePaint);
+        top += DP5 + DP36;
 
-        //step 2.4、油类型
-        top += DP10 + DP36;
-        mTypeTextPoint.set(left, mDescTextHeight / 2 + top);
-        mTypeTextArtist.setAlignReferencePoint(mTypeTextPoint);
-        mTypeTextArtist.draw(canvas);
+        for (int i = 0; i < typeArtistList.size(); i++) {
+            TextArtist typeArtist = typeArtistList.get(i);
+            //step 2.4、油类型
+            top += DP5;
+            mTypeTextPoint.set(left, typeArtist.getHeight() / 2 + top);
+            typeArtist.setAlignReferencePoint(mTypeTextPoint);
+            typeArtist.draw(canvas);
 
-        //step 2.5、油价格
-        int priceTextX = width - DP15;
-        mPriceTextPoint.set(priceTextX, mDescTextHeight / 2 + top);
-        mPriceTextArtist.setAlignReferencePoint(mPriceTextPoint);
-        mPriceTextArtist.draw(canvas);
+            //step 2.5、油价格
+            TextArtist priceTextArtist = priceArtistList.get(i);
+            int priceTextX = width - DP15;
+            mPriceTextPoint.set(priceTextX, priceTextArtist.getHeight() / 2 + top);
+            priceTextArtist.setAlignReferencePoint(mPriceTextPoint);
+            priceTextArtist.draw(canvas);
+
+            top += typeArtist.getHeight();
+
+        }
 
 
     }

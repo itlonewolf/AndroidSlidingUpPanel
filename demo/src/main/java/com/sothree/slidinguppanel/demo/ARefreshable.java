@@ -110,11 +110,15 @@ public abstract class ARefreshable implements IInteractive {
     public boolean isInteractive() {
         return false;
     }
-    
+
+    /**
+     *
+     * @param isPressing
+     */
     public void setPressed(boolean isPressing) {
         this.isPressing = isPressing;
     }
-    
+
     @Override
     public boolean isPressing() {
         return isPressing;

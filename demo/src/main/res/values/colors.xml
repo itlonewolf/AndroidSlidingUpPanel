@@ -522,5 +522,5 @@
     <color name="dialog_bg_color_center">#FFFFFF</color>
     <!--横屏底部弹出框背景色值-->
     <color name="dialog_bg_color_bottom_h">#12181E</color>
-
+    <color name="search_detail_evaluate">#ffbd00</color>
 </resources>

@@ -93,7 +93,7 @@ public class TextArtist {
     
     private void measure() {
         
-        Layout.Alignment alignment = Layout.Alignment.ALIGN_NORMAL;
+        Alignment alignment = Alignment.ALIGN_NORMAL;
         switch (setting.align) {
             case ALIGN_LT:
             case ALIGN_LC:
@@ -344,7 +344,7 @@ public class TextArtist {
         /**
          * 可变尺寸数据集合
          */
-        private ArrayList<VariableData> variableDataList = new ArrayList<TextArtist.VariableData>();
+        private ArrayList<VariableData> variableDataList = new ArrayList<VariableData>();
         
         /**
          * 画笔

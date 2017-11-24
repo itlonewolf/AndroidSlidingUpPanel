@@ -79,7 +79,7 @@ public class ParkingBean extends ARefreshable {
     }
 
     @Override
-    void initAssemble() {
+protected     void initAssemble() {
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         TextArtist.TextArtistSetting titleTextArtistSetting = getTitleTextArtistSetting(textPaint);
         mTitleTextArtist = new TextArtist(titleTextArtistSetting);
@@ -105,6 +105,16 @@ public class ParkingBean extends ARefreshable {
         updateSize();
     }
 
+    @Override
+    public int height() {
+        return 0;
+    }
+
+    @Override
+    public int width() {
+        return 0;
+    }
+
     private void updateSize() {
         mFreeHeight = mFreeTextArtist.getHeight();
         mTotalHeight = mTotalTextArtist.getHeight();
@@ -115,15 +125,7 @@ public class ParkingBean extends ARefreshable {
     }
 
 
-    @Override
-    public int height() {
-        return height;
-    }
 
-    @Override
-    public int width() {
-        return width;
-    }
 
     @Override
     protected void drawContentInner(Canvas canvas) {
