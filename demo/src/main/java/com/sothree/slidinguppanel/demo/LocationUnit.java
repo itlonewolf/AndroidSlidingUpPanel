@@ -1,13 +1,8 @@
 package com.sothree.slidinguppanel.demo;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
-import android.support.constraint.solver.Goal;
 import android.text.TextPaint;
 
 
@@ -77,8 +72,8 @@ public class LocationUnit extends ARefreshable {
     @Override
     protected void initAssemble() {
         textPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
-        mBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_location)).getBitmap();
-        phoneBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_location)).getBitmap();
+        mBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_arrow)).getBitmap();
+        phoneBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_arrow)).getBitmap();
         TextArtist.TextArtistSetting titleTextArtistSetting = getAddressTextArtistSetting(textPaint);
         mTitleTextArtist = new TextArtist(titleTextArtistSetting);
 

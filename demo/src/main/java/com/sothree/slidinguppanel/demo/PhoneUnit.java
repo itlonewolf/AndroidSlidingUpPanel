@@ -2,15 +2,11 @@ package com.sothree.slidinguppanel.demo;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
-
-import org.w3c.dom.ProcessingInstruction;
 
 /**
  * 联系方式
@@ -90,8 +86,8 @@ public class PhoneUnit extends ARefreshable {
         int textMarginLeft = DP44;
         int textTop = DP15 + titleHeight / 2;
         //step 2.1 手机图片
-        mBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_location)).getBitmap();
-        arrowBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_location)).getBitmap();
+        mBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_arrow)).getBitmap();
+        arrowBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_arrow)).getBitmap();
         canvas.drawBitmap(mBitmap, DP15, DP15, textPaint);
 
         //step 2.2 手机号

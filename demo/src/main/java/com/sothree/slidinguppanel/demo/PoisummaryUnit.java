@@ -1,13 +1,6 @@
 package com.sothree.slidinguppanel.demo;
 
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.ColorFilter;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
-import android.graphics.Rect;
+import android.graphics.*;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -240,10 +233,10 @@ public class PoisummaryUnit extends ARefreshable {
 
         commonSinglePoint = new Point();
         distancePoint = new Point();
-
-
-        phoneBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_location)).getBitmap();
-        arrowBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_location)).getBitmap();
+    
+    
+        phoneBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_arrow)).getBitmap();
+        arrowBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_arrow)).getBitmap();
         collectionSelectedBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_like_selected)).getBitmap();
         collectionCancelBitmap = ((BitmapDrawable) GlobalUtil.getContext().getResources().getDrawable(R.drawable.ic_like_cancel)).getBitmap();
 
