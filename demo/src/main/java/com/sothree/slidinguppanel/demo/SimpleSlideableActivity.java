@@ -46,14 +46,10 @@ public class SimpleSlideableActivity extends AppCompatActivity {
     public void demoCase() {
         DisplayMetrics dm = GlobalUtil.getResources().getDisplayMetrics();
     
-        refreshTitle = TitleBean.demoBean(dm.widthPixels);
-        ARefreshable   distanceBean = DistanceBean.demoBean(dm.widthPixels);
-        ARefreshable   oilPriceBean = OilPriceBean.demoBean(dm.widthPixels);
-        ARefreshable   parkingBean = ParkingBean.demoBean(dm.widthPixels);
-        ARefreshable   landUnit = PoisummaryUnit.demoBean(dm.widthPixels);
-        ARefreshable   rechargeInfoBean = ChargeSituationUnit.demoBean(dm.widthPixels);
-        mAssembleView.addItems(oilPriceBean);
-        refreshTitle = TitleBean.TitleUnit.demoBean(dm.widthPixels);
+        refreshTitle = TitleUnit.demoBean(dm.widthPixels);
+        ARefreshable distanceBean = DistanceUnit.demoBean(dm.widthPixels);
+        ARefreshable bean2        = RecommendationBean.demoBean(dm.widthPixels);
+        mAssembleView.addItems(bean2, refreshTitle, distanceBean);
 //        mAssembleView.addItems(refreshTitle, distanceBean, distanceBean2);
     }
 }
